@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نتائج مسابقة حفظ القرآن الكريم — قرية قونة</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root { --gold:#c49b37; --gold-bright:#e8c96a; --gold-pale:#f5e8c0; --dark:#050e1a; --dark2:#0a1e35; --cream:#fdf6e3; }
+body { font-family:'Tajawal',sans-serif; background:var(--dark); min-height:100vh; color:white; direction:rtl; }
+.search-page { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; background: radial-gradient(ellipse 800px 600px at 50% 40%, rgba(13,51,70,0.8) 0%, transparent 70%), linear-gradient(160deg,#050e1a 0%,#0a1e35 50%,#050e1a 100%); position:relative; overflow:hidden; }
+.search-page::before { content:''; position:absolute; inset:0; background-image:radial-gradient(rgba(196,155,55,0.08) 1px, transparent 1px); background-size:40px 40px; pointer-events:none; }
+.logo-area { text-align:center; margin-bottom:50px; }
+.logo-icon { font-size:64px; margin-bottom:16px; display:block; filter:drop-shadow(0 0 20px rgba(196,155,55,0.4)); }
+.logo-title { font-family:'Amiri',serif; font-size:38px; font-weight:700; color:var(--gold-bright); text-shadow:0 0 30px rgba(196,155,55,0.3); margin-bottom:8px; }
+.logo-sub { font-size:18px; color:rgba(196,155,55,0.60); font-weight:300; }
+.divider-gold { display:flex; align-items:center; gap:16px; width:100%; max-width:500px; margin:20px 0; }
+.divider-gold::before,.divider-gold::after { content:''; flex:1; height:1px; }
+.divider-gold::before { background:linear-gradient(to right, transparent, rgba(196,155,55,0.5)); }
+.divider-gold::after  { background:linear-gradient(to left,  transparent, rgba(196,155,55,0.5)); }
+.divider-gold span { width:8px; height:8px; background:var(--gold); transform:rotate(45deg); box-shadow:0 0 8px rgba(196,155,55,0.6); flex-shrink:0; }
+.search-box { width:100%; max-width:520px; background:rgba(255,255,255,0.04); border:1px solid rgba(196,155,55,0.30); border-radius:4px; padding:36px 32px; backdrop-filter:blur(10px); position:relative; }
+.search-box::before { content:''; position:absolute; top:0; left:15%; right:15%; height:2px; background:linear-gradient(to right,transparent,var(--gold-bright),transparent); }
+.search-label { font-family:'Amiri',serif; font-size:22px; color:var(--gold-pale); margin-bottom:20px; text-align:center; }
+.search-input { width:100%; padding:16px 20px; background:rgba(255,255,255,0.06); border:1px solid rgba(196,155,55,0.35); border-radius:3px; color:white; font-family:'Tajawal',sans-serif; font-size:20px; text-align:center; direction:rtl; outline:none; transition:all 0.3s; margin-bottom:16px; }
+.search-input:focus { border-color:var(--gold); background:rgba(196,155,55,0.08); box-shadow:0 0 20px rgba(196,155,55,0.15); }
+.search-input::placeholder { color:rgba(255,255,255,0.25); }
+.search-btn { width:100%; padding:16px; background:linear-gradient(135deg,#b48a2d,#e8c96a,#b48a2d); border:none; border-radius:3px; color:#050e1a; font-family:'Amiri',serif; font-size:22px; font-weight:700; cursor:pointer; transition:all 0.3s; letter-spacing:1px; }
+.search-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(196,155,55,0.35); }
+.search-btn:active { transform:translateY(0); }
+.result-area { width:100%; max-width:520px; margin-top:24px; }
+.result-card { background:rgba(255,255,255,0.04); border:1px solid rgba(196,155,55,0.25); border-radius:4px; padding:24px; margin-bottom:16px; cursor:pointer; transition:all 0.3s; position:relative; }
+.result-card::before { content:''; position:absolute; top:0; left:10%; right:10%; height:2px; background:linear-gradient(to right,transparent,rgba(196,155,55,0.5),transparent); }
+.result-card:hover { border-color:var(--gold); background:rgba(196,155,55,0.07); transform:translateY(-2px); }
+.rc-name { font-family:'Amiri',serif; font-size:24px; color:var(--gold-bright); margin-bottom:8px; }
+.rc-level { font-size:15px; color:rgba(196,155,55,0.70); }
+.rc-hint { font-size:13px; color:rgba(255,255,255,0.30); margin-top:6px; }
+.not-found { text-align:center; padding:30px; background:rgba(200,50,50,0.08); border:1px solid rgba(200,50,50,0.20); border-radius:4px; }
+.not-found-icon { font-size:40px; margin-bottom:12px; }
+.not-found-text { font-family:'Amiri',serif; font-size:22px; color:rgba(255,150,150,0.80); }
+.not-found-sub { font-size:14px; color:rgba(255,255,255,0.35); margin-top:8px; }
+.id-page { display:none; min-height:100vh; background:var(--dark); align-items:center; justify-content:center; flex-direction:column; padding:30px 20px; }
+.id-page.active { display:flex; }
+.back-btn { display:flex; align-items:center; gap:8px; background:rgba(196,155,55,0.10); border:1px solid rgba(196,155,55,0.30); color:var(--gold); font-family:'Tajawal',sans-serif; font-size:16px; padding:10px 22px; border-radius:3px; cursor:pointer; margin-bottom:28px; transition:all 0.3s; }
+.back-btn:hover { background:rgba(196,155,55,0.18); }
+.id-card-wrap { display:flex; flex-direction:column; align-items:center; gap:20px; }
+.id-card { width:520px; background:linear-gradient(145deg,#050e1a 0%,#0a2035 40%,#0d2d48 70%,#0a2035 100%); border-radius:6px; position:relative; overflow:hidden; box-shadow:0 0 0 1px rgba(196,155,55,0.20),0 0 0 3px rgba(196,155,55,0.08),0 20px 60px rgba(0,0,0,0.7),0 0 80px rgba(196,155,55,0.08); font-family:'Amiri',serif; }
+.id-card.fail-card { background:linear-gradient(145deg,#0e0a14 0%,#1a0e2a 40%,#1e1040 70%,#1a0e2a 100%); box-shadow:0 0 0 1px rgba(120,80,180,0.20),0 0 0 3px rgba(120,80,180,0.08),0 20px 60px rgba(0,0,0,0.7); }
+.card-bg { position:absolute; inset:0; z-index:0; pointer-events:none; }
+.card-glow { position:absolute; width:400px; height:300px; top:50%; left:50%; transform:translate(-50%,-50%); background:radial-gradient(ellipse,rgba(196,155,55,0.12) 0%,transparent 70%); z-index:0; pointer-events:none; }
+.card-glow.fail-glow { background:radial-gradient(ellipse,rgba(120,80,180,0.10) 0%,transparent 70%); }
+.card-border-outer { position:absolute; inset:10px; border:1px solid rgba(196,155,55,0.18); z-index:1; pointer-events:none; }
+.card-border-main  { position:absolute; inset:16px; border:2px solid rgba(196,155,55,0.55); z-index:1; pointer-events:none; }
+.card-border-outer.fail-b { border-color:rgba(120,80,180,0.20); }
+.card-border-main.fail-b  { border-color:rgba(120,80,180,0.45); }
+.card-content { position:relative; z-index:2; padding:32px 36px 28px; display:flex; flex-direction:column; align-items:center; }
+.card-bism { font-size:14px; color:rgba(220,185,110,0.55); margin-bottom:10px; letter-spacing:1px; }
+.card-divider { display:flex; align-items:center; gap:10px; width:100%; margin-bottom:12px; }
+.cdl{flex:1;height:1px;} .cdl-l{background:linear-gradient(to right,transparent,rgba(196,155,55,0.5));} .cdl-r{background:linear-gradient(to left,transparent,rgba(196,155,55,0.5));}
+.cdg{width:7px;height:7px;background:var(--gold);transform:rotate(45deg);box-shadow:0 0 6px rgba(196,155,55,0.6);}
+.cdg-sm{width:4px;height:4px;background:rgba(196,155,55,0.5);transform:rotate(45deg);}
+.fail-card .cdl-l{background:linear-gradient(to right,transparent,rgba(120,80,180,0.5));}
+.fail-card .cdl-r{background:linear-gradient(to left,transparent,rgba(120,80,180,0.5));}
+.fail-card .cdg{background:#7850b4;} .fail-card .cdg-sm{background:rgba(120,80,180,0.5);}
+.card-org { font-size:13px; color:rgba(196,155,55,0.55); letter-spacing:2px; margin-bottom:6px; text-align:center; }
+.card-event-title { font-size:18px; font-weight:700; color:var(--gold-bright); text-align:center; margin-bottom:16px; }
+.fail-card .card-event-title { color:rgba(180,150,230,0.90); }
+.card-id-badge { width:64px;height:64px;border-radius:50%;background:rgba(196,155,55,0.10);border:2px solid rgba(196,155,55,0.45);display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:14px; }
+.fail-card .card-id-badge { background:rgba(120,80,180,0.10); border-color:rgba(120,80,180,0.45); }
+.badge-label{font-size:10px;color:rgba(196,155,55,0.60);letter-spacing:1px;font-family:'Tajawal',sans-serif;}
+.badge-num{font-size:24px;font-weight:700;color:var(--gold-bright);line-height:1;}
+.fail-card .badge-label{color:rgba(180,150,230,0.60);} .fail-card .badge-num{color:rgba(180,150,230,0.90);}
+.card-name{font-size:28px;font-weight:700;color:white;text-align:center;margin-bottom:6px;line-height:1.3;}
+.card-level-badge{display:inline-block;background:rgba(196,155,55,0.12);border:1px solid rgba(196,155,55,0.40);color:var(--gold-bright);font-size:17px;padding:5px 20px;border-radius:2px;margin-bottom:18px;position:relative;}
+.card-level-badge::before{content:'';position:absolute;top:0;left:15%;right:15%;height:1.5px;background:linear-gradient(to right,transparent,var(--gold-bright),transparent);}
+.fail-card .card-level-badge{background:rgba(120,80,180,0.12);border-color:rgba(120,80,180,0.40);color:rgba(180,150,230,0.90);}
+.fail-card .card-level-badge::before{background:linear-gradient(to right,transparent,rgba(180,150,230,0.7),transparent);}
+.card-info-grid{width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.info-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(196,155,55,0.14);padding:8px 14px;border-radius:2px;}
+.fail-card .info-row{border-color:rgba(120,80,180,0.14);}
+.info-row-icon{font-size:16px;flex-shrink:0;}
+.info-row-label{font-size:13px;color:rgba(196,155,55,0.60);font-family:'Tajawal',sans-serif;flex-shrink:0;}
+.fail-card .info-row-label{color:rgba(180,150,230,0.60);}
+.info-row-val{font-size:16px;color:rgba(245,228,180,0.90);flex:1;text-align:right;}
+.card-footer-verse{font-size:13px;font-style:italic;color:rgba(196,155,55,0.40);text-align:center;margin-top:4px;}
+.fail-card .card-footer-verse{color:rgba(120,80,180,0.40);}
+.status-banner{border-radius:4px;padding:14px 24px;text-align:center;margin-bottom:16px;width:100%;}
+.status-banner.win{background:linear-gradient(135deg,rgba(30,100,50,0.25),rgba(30,100,50,0.10));border:1px solid rgba(80,200,100,0.30);}
+.status-banner.lose{background:linear-gradient(135deg,rgba(80,40,120,0.25),rgba(60,30,100,0.10));border:1px solid rgba(140,100,200,0.30);}
+.status-icon{font-size:28px;}
+.status-text{font-family:'Amiri',serif;font-size:18px;margin-top:4px;}
+.status-banner.win .status-text{color:rgba(120,220,140,0.90);}
+.status-banner.lose .status-text{color:rgba(180,150,230,0.90);}
+.card-corners{position:absolute;inset:0;z-index:1;pointer-events:none;}
+.hint-bar{background:rgba(196,155,55,0.08);border:1px solid rgba(196,155,55,0.20);border-radius:4px;padding:12px 20px;text-align:center;font-size:14px;color:rgba(196,155,55,0.70);max-width:520px;width:100%;}
+.hint-bar.fail-hint{background:rgba(120,80,180,0.08);border-color:rgba(120,80,180,0.20);color:rgba(180,150,230,0.70);}
+/* ══ STATS ══ */
+.stats-row{display:flex;gap:12px;width:100%;max-width:520px;margin-bottom:20px;}
+.stat-box{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(196,155,55,0.22);border-radius:4px;padding:14px 10px;text-align:center;position:relative;overflow:hidden;}
+.stat-box::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1.5px;background:linear-gradient(to right,transparent,rgba(196,155,55,0.5),transparent);}
+.stat-num{font-family:'Amiri',serif;font-size:32px;font-weight:700;color:var(--gold-bright);line-height:1;}
+.stat-lbl{font-size:12px;color:rgba(196,155,55,0.55);margin-top:4px;}
+.stat-box.green{border-color:rgba(80,200,100,0.22);}
+.stat-box.green::before{background:linear-gradient(to right,transparent,rgba(80,200,100,0.4),transparent);}
+.stat-box.green .stat-num{color:rgba(120,220,140,0.90);}
+.stat-box.green .stat-lbl{color:rgba(80,200,100,0.55);}
+@media(max-width:560px){.id-card{width:100%;}.logo-title{font-size:28px;}}
+</style>
+</head>
+<body>
+
+<div class="search-page" id="searchPage">
+  <div class="logo-area">
+    <span class="logo-icon">🕌</span>
+    <div class="logo-title">مسابقة حفظ القرآن الكريم</div>
+    <div class="logo-sub">قرية قونة — المسجد البحري</div>
+  </div>
+  <div class="divider-gold"><span></span></div>
+  <div class="stats-row" id="statsRow">
+    <div class="stat-box"><div class="stat-num" id="statTotal">--</div><div class="stat-lbl">إجمالي المشتركين</div></div>
+    <div class="stat-box green"><div class="stat-num" id="statWin">--</div><div class="stat-lbl">المتأهلون للتكريم</div></div>
+    <div class="stat-box"><div class="stat-num" id="statFail">--</div><div class="stat-lbl">لم يتأهلوا</div></div>
+  </div>
+  <div class="search-box">
+    <div class="search-label">ابحث عن اسمك</div>
+    <input class="search-input" id="searchInput" type="text" placeholder="اكتب اسمك هنا..."
+      oninput="doSearch(this.value)"
+      onkeydown="if(event.key==='Enter') doSearch(document.getElementById('searchInput').value)"/>
+    <button class="search-btn" onclick="doSearch(document.getElementById('searchInput').value)">بحث</button>
+  </div>
+  <div class="result-area" id="resultArea"></div>
+</div>
+
+<div class="id-page" id="idPage">
+  <button class="back-btn" onclick="goBack()">← رجوع للبحث</button>
+  <div class="id-card-wrap">
+    <div class="status-banner" id="statusBanner">
+      <div class="status-icon" id="statusIcon"></div>
+      <div class="status-text" id="statusText"></div>
+    </div>
+    <div class="id-card" id="theCard">
+      <svg class="card-bg" id="cardBgSvg" viewBox="0 0 520 360" preserveAspectRatio="xMidYMid slice"></svg>
+      <div class="card-glow" id="cardGlow"></div>
+      <div class="card-border-outer" id="cbo"></div>
+      <div class="card-border-main"  id="cbm"></div>
+      <svg class="card-corners" viewBox="0 0 520 360">
+        <defs><g id="cc">
+          <line x1="0" y1="45" x2="0" y2="0" stroke="rgba(196,155,55,0.75)" stroke-width="1.8"/>
+          <line x1="0" y1="0" x2="45" y2="0" stroke="rgba(196,155,55,0.75)" stroke-width="1.8"/>
+          <polygon points="0,-7 9,0 0,7 -9,0" fill="#c49b37" opacity="0.85"/>
+          <line x1="14" y1="-3" x2="14" y2="3" stroke="rgba(196,155,55,0.45)" stroke-width="1"/>
+          <line x1="28" y1="-3" x2="28" y2="3" stroke="rgba(196,155,55,0.30)" stroke-width="1"/>
+          <line x1="-3" y1="14" x2="3" y2="14" stroke="rgba(196,155,55,0.45)" stroke-width="1"/>
+          <line x1="-3" y1="28" x2="3" y2="28" stroke="rgba(196,155,55,0.30)" stroke-width="1"/>
+        </g></defs>
+        <use href="#cc" transform="translate(16,16)"/>
+        <use href="#cc" transform="translate(504,16) scale(-1,1)"/>
+        <use href="#cc" transform="translate(16,344) scale(1,-1)"/>
+        <use href="#cc" transform="translate(504,344) scale(-1,-1)"/>
+      </svg>
+      <div class="card-content">
+        <div class="card-bism">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</div>
+        <div class="card-divider"><div class="cdl cdl-l"></div><div class="cdg-sm"></div><div class="cdg"></div><div class="cdg-sm"></div><div class="cdl cdl-r"></div></div>
+        <div class="card-org">قرية قونة — المسجد البحري</div>
+        <div class="card-event-title" id="cardTitle">المسابقة السنوية لحفظ القرآن الكريم</div>
+        <div class="card-id-badge"><span class="badge-label">ID</span><span class="badge-num" id="cardId">--</span></div>
+        <div class="card-name" id="cardName">--</div>
+        <div class="card-level-badge" id="cardLevel">--</div>
+        <div class="card-divider" style="margin-bottom:12px"><div class="cdl cdl-l"></div><div class="cdg-sm"></div><div class="cdg"></div><div class="cdg-sm"></div><div class="cdl cdl-r"></div></div>
+        <div class="card-info-grid" id="cardInfo"></div>
+        <div class="card-footer-verse">﴿ وَرَتِّلِ الْقُرْآنَ تَرْتِيلاً ﴾</div>
+      </div>
+    </div>
+    <div class="hint-bar" id="hintBar"></div>
+  </div>
+</div>
+
+<script>
+const S=[
+
+// ══════════════════════════════════════════════════════
+// المستوى الثالث — نصف القرآن — بنات (36 طالبة)
+// ══════════════════════════════════════════════════════
+{id:1,  name:"روفان سيد دعبس",               level:"نصف القرآن", w:false, date:""},
+{id:2,  name:"نيجار محمد احمد ربيع",          level:"نصف القرآن", w:false, date:""},
+{id:3,  name:"مريم اسماعيل الشرقاوي",         level:"نصف القرآن", w:false, date:""},
+{id:4,  name:"فاطمه يوسف يوسف نعيم",          level:"نصف القرآن", w:false, date:""},
+{id:5,  name:"حفصه محمد جابر شلبي",           level:"نصف القرآن", w:false, date:""},
+{id:6,  name:"هاجر علاء محمد ربيع",           level:"نصف القرآن", w:false, date:""},
+{id:7,  name:"خديجه سعيد المزين",             level:"نصف القرآن", w:false, date:""},
+{id:8,  name:"ملك حسام جمال عماره",           level:"نصف القرآن", w:false, date:""},
+{id:9,  name:"مريم ابراهيم ابوالخير",          level:"نصف القرآن", w:false, date:""},
+{id:10, name:"عائشه حماده ابوهلال",           level:"نصف القرآن", w:false, date:""},
+{id:11, name:"حفصه حماده ابوهلال",            level:"نصف القرآن", w:false, date:""},
+{id:12, name:"نورين حسن طه ابوقوره",          level:"نصف القرآن", w:false, date:""},
+{id:13, name:"مريم عمران محمد عمران",          level:"نصف القرآن", w:false, date:""},
+{id:14, name:"سما محمد عبدالعزيز رضوان",       level:"نصف القرآن", w:false, date:""},
+{id:15, name:"مريم محمد محمد معوض",            level:"نصف القرآن", w:false, date:""},
+{id:16, name:"شذي عبدالعاطي بدوي",            level:"نصف القرآن", w:false, date:""},
+{id:17, name:"اسماء ايمن نعناعه",             level:"نصف القرآن", w:false, date:""},
+{id:18, name:"اسماء عبدالرحمن زاهر",          level:"نصف القرآن", w:false, date:""},
+{id:19, name:"نور رمضان جمعه حتحوت",          level:"نصف القرآن", w:false, date:""},
+{id:20, name:"منار حامد كامل البنا",           level:"نصف القرآن", w:false, date:""},
+{id:21, name:"سلمي سعد محمد ربيع",            level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:22, name:"سما ايهاب يوسف الصباغ",         level:"نصف القرآن", w:false, date:""},
+{id:23, name:"ملك محمد السيد خطاب",           level:"نصف القرآن", w:false, date:""},
+{id:24, name:"اروي حاتم محمد معوض",           level:"نصف القرآن", w:false, date:""},
+{id:25, name:"ريناد علي رضوان",               level:"نصف القرآن", w:false, date:""},
+{id:26, name:"رؤي وليد مجدي احمد طه",         level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:27, name:"ساره رمزي لطفي المزين",         level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:28, name:"ريم مصطفي لطفي المزين",         level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:29, name:"رنيم وائل محمد معوض",           level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:30, name:"عائشه حسام الشناوي",            level:"نصف القرآن", w:false, date:""},
+{id:31, name:"مريم محمد محمود عمران",          level:"نصف القرآن", w:false, date:""},
+{id:32, name:"اروي السيد بدير اصيل",          level:"نصف القرآن", w:false, date:""},
+{id:33, name:"عائشه علي محمد رضوان",          level:"نصف القرآن", w:false, date:""},
+{id:34, name:"رودينا السيد الحسيني نعناعه",    level:"نصف القرآن", w:false, date:""},
+{id:35, name:"مريم السيد محروس جادو",         level:"نصف القرآن", w:false, date:""},
+{id:36, name:"نور السيد علي رضوان",           level:"نصف القرآن", w:false, date:""},
+
+// ══════════════════════════════════════════════════════
+// المستوى الثالث — نصف القرآن — أولاد (41 طالب)
+// ══════════════════════════════════════════════════════
+{id:1,  name:"عمر احمد صبحي ربيع",            level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:2,  name:"محمد عايد ابراهيم رضوان",        level:"نصف القرآن", w:false, date:""},
+{id:3,  name:"محمد رمضان شداد",               level:"نصف القرآن", w:false, date:""},
+{id:4,  name:"يحي محمد علي رضوان",            level:"نصف القرآن", w:false, date:""},
+{id:5,  name:"سعيد محمد السعيد داود",          level:"نصف القرآن", w:false, date:""},
+{id:6,  name:"بسيوني احمد بسيوني شحاته",       level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:7,  name:"يوسف محمد سرور",               level:"نصف القرآن", w:false, date:""},
+{id:8,  name:"كريم محمد فؤاد خطاب",           level:"نصف القرآن", w:false, date:""},
+{id:9,  name:"احمد ابراهيم شنيطه",            level:"نصف القرآن", w:false, date:""},
+{id:10, name:"احمد محمد حسن بدوي",            level:"نصف القرآن", w:false, date:""},
+{id:11, name:"محمد وائل ابوالجدايل",           level:"نصف القرآن", w:false, date:""},
+{id:12, name:"مازن عبدالفتاح جادو",           level:"نصف القرآن", w:false, date:""},
+{id:13, name:"عاصم محمد شلبي حسونه",          level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:14, name:"محمد سعيد يوسف نعيم",           level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:15, name:"ابوبكر محمد يوسف نعيم",         level:"نصف القرآن", w:false, date:""},
+{id:16, name:"سيف باسم محروس جادو",           level:"نصف القرآن", w:false, date:""},
+{id:17, name:"احمد محمد علي المزين",           level:"نصف القرآن", w:false, date:""},
+{id:18, name:"محمد حمدي محمد البنا",          level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:19, name:"يوسف حمدي محمد البنا",          level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:20, name:"عبدالرحمن وليد حيدر",           level:"نصف القرآن", w:false, date:""},
+{id:21, name:"احمد محمد عبدالتواب ربيع",       level:"نصف القرآن", w:false, date:""},
+{id:22, name:"يحي محمد خطاب",                level:"نصف القرآن", w:false, date:""},
+{id:23, name:"عبدالرحمن علاء معوض",           level:"نصف القرآن", w:false, date:""},
+{id:24, name:"ادم محمد صبحي ربيع",            level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:25, name:"محمد وفا علي داوود",            level:"نصف القرآن", w:false, date:""},
+{id:26, name:"احمد محمد حسن قاسم",            level:"نصف القرآن", w:false, date:""},
+{id:27, name:"احمد سعيد محمد صديق",           level:"نصف القرآن", w:false, date:""},
+{id:28, name:"محمود محمد محمد القاضي",         level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:29, name:"يوسف ايهاب سرور",              level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:30, name:"انس محمد القاضي",              level:"نصف القرآن", w:false, date:""},
+{id:31, name:"احمد محمد بسيوني شحاته",        level:"نصف القرآن", w:false, date:""},
+{id:32, name:"عبدالرحمن وائل ابوالجدايل",      level:"نصف القرآن", w:false, date:""},
+{id:33, name:"احمد حمدي علي زغلول",           level:"نصف القرآن", w:false, date:""},
+{id:34, name:"حذيفه محمد عبدالتواب زغلول",     level:"نصف القرآن", w:false, date:""},
+{id:35, name:"محمد خالد عزيز زغلول",          level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:36, name:"انس عبدالله عبدالتواب الطباح",   level:"نصف القرآن", w:false, date:""},
+{id:37, name:"معاذ علي اسماعيل دعس",          level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:38, name:"عبدالرحمن ابراهيم عمران",        level:"نصف القرآن", w:false, date:""},
+{id:39, name:"يحي محمد حسن نعناعه",           level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:40, name:"عبدالعزيز محمد نعناعه",          level:"نصف القرآن", w:false, date:""},
+{id:41, name:"محمود السيد سرور",              level:"نصف القرآن", w:false, date:""},
+{id:42, name:"ادم عبده احمد الطباخ",          level:"نصف القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+
+// ══════════════════════════════════════════════════════
+// المستوى الثالث — ثلاثة أرباع القرآن — ناجحون فقط (من الصور)
+// ══════════════════════════════════════════════════════
+{id:1,  name:"حمزه علي حمزه ابوالجدايل",       level:"ثلاثة أرباع القرآن", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:2,  name:"علي محمد نصر داود",             level:"ثلاثة أرباع القرآن", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:3,  name:"عائشه اسماعيل ابراهيم الشرقاوي", level:"ثلاثة أرباع القرآن", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:4,  name:"اميره مدحت رشاد المزين",         level:"ثلاثة أرباع القرآن", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:5,  name:"اماني علي حمزه ابوالجدايل",      level:"ثلاثة أرباع القرآن", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:6,  name:"حبيبه محمد علي المزين",          level:"ثلاثة أرباع القرآن", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+
+// ══════════════════════════════════════════════════════
+// المستوى الرابع — ربع القرآن — أولاد (83 طالب)
+// ══════════════════════════════════════════════════════
+{id:1,  name:"احمد زين صبحي غنيم",            level:"ربع القرآن", w:false, date:""},
+{id:2,  name:"ابراهيم محمد جادو",             level:"ربع القرآن", w:false, date:""},
+{id:3,  name:"عمر محمد عيد ربيع",             level:"ربع القرآن", w:false, date:""},
+{id:4,  name:"مروان ايمن الشرقاوي",            level:"ربع القرآن", w:false, date:""},
+{id:5,  name:"احمد علاء محمد ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:6,  name:"محمد علي حتحوت",               level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:7,  name:"محمود ابراهيم معوض",             level:"ربع القرآن", w:false, date:""},
+{id:8,  name:"يحي ربيع ربيع",                level:"ربع القرآن", w:false, date:""},
+{id:9,  name:"فارس ايهاب قداده",              level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:10, name:"حمزه احمد الطباخ",              level:"ربع القرآن", w:false, date:""},
+{id:11, name:"محمد رمضان رضوان",              level:"ربع القرآن", w:false, date:""},
+{id:12, name:"محمود محمد عمران",              level:"ربع القرآن", w:false, date:""},
+{id:13, name:"ادم امين سمير زاهر",            level:"ربع القرآن", w:false, date:""},
+{id:14, name:"ياسين فتحي العجواني",            level:"ربع القرآن", w:false, date:""},
+{id:15, name:"احمد محمد ماجور",               level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:16, name:"عمر سيد مصطفي قاسم",            level:"ربع القرآن", w:false, date:""},
+{id:17, name:"جمعه عبدالله شحاته",            level:"ربع القرآن", w:false, date:""},
+{id:18, name:"عمر خالد قداده",               level:"ربع القرآن", w:false, date:""},
+{id:19, name:"ادم فؤاد محمد قداده",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:20, name:"سفيان شلبي حسونه",              level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:21, name:"محمد علاء قاسم",               level:"ربع القرآن", w:false, date:""},
+{id:22, name:"يوسف اسلام فؤاد جادو",          level:"ربع القرآن", w:false, date:""},
+{id:23, name:"يحي عبدالله الطباخ",            level:"ربع القرآن", w:false, date:""},
+{id:24, name:"مازن محمد بدر داود",            level:"ربع القرآن", w:false, date:""},
+{id:25, name:"انس احمد سرور",                level:"ربع القرآن", w:false, date:""},
+{id:26, name:"محمد عيد السعيد داود",           level:"ربع القرآن", w:false, date:""},
+{id:27, name:"احمد شعبان يوسف نعيم",          level:"ربع القرآن", w:false, date:""},
+{id:28, name:"عمر محمد شاهين معوض",           level:"ربع القرآن", w:false, date:""},
+{id:29, name:"عمر سيد دعبس",                 level:"ربع القرآن", w:false, date:""},
+{id:30, name:"مصطفي كامل البنا",              level:"ربع القرآن", w:false, date:""},
+{id:31, name:"احمد عبدالرحمن القاضي",          level:"ربع القرآن", w:false, date:""},
+{id:32, name:"احمد محمد فؤاد خطاب",           level:"ربع القرآن", w:false, date:""},
+{id:33, name:"باسم رمضان جمعه حتحوت",         level:"ربع القرآن", w:false, date:""},
+{id:34, name:"يوسف محمد محمد قمر",            level:"ربع القرآن", w:false, date:""},
+{id:35, name:"اياد صدام ابوالفتوح ابوالعال",   level:"ربع القرآن", w:false, date:""},
+{id:36, name:"احمد محمد ابراهيم شحاته",        level:"ربع القرآن", w:false, date:""},
+{id:37, name:"عمار صدام ابوالفتوح ابوالعال",   level:"ربع القرآن", w:false, date:""},
+{id:38, name:"عبدالفتاح رمضان القزاز",         level:"ربع القرآن", w:false, date:""},
+{id:39, name:"زياد حماده بسيوني العادلي",       level:"ربع القرآن", w:false, date:""},
+{id:40, name:"ابراهيم احمد ابراهيم ابوهلال",   level:"ربع القرآن", w:false, date:""},
+{id:41, name:"حمزه رجب اسماعيل شرعان",         level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:42, name:"كريم وسام احمد ابوالعينين",       level:"ربع القرآن", w:false, date:""},
+{id:43, name:"احمد حسام الطنطاوي",             level:"ربع القرآن", w:false, date:""},
+{id:44, name:"ادم عبده احمد الطباخ",           level:"ربع القرآن", w:false, date:""},
+{id:45, name:"مصطفي احمد السيد خطاب",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:46, name:"علي محمد نبيه ربيع",             level:"ربع القرآن", w:false, date:""},
+{id:47, name:"محمد حماده الصباغ",             level:"ربع القرآن", w:false, date:""},
+{id:48, name:"محمد عبدالرحمن الرشيدي",         level:"ربع القرآن", w:false, date:""},
+{id:49, name:"مصطفي عبدالرحمن الرشيدي",        level:"ربع القرآن", w:false, date:""},
+{id:50, name:"محمد هاني احمد ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:51, name:"عبدالله حاتم معوض",             level:"ربع القرآن", w:false, date:""},
+{id:52, name:"احمد عبدالعزيز مبروك",           level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:53, name:"محمد عبدالرحمن المزين",          level:"ربع القرآن", w:false, date:""},
+{id:54, name:"محمد ابوطالب داود",             level:"ربع القرآن", w:false, date:""},
+{id:55, name:"احمد عوني سعيد معوض",            level:"ربع القرآن", w:false, date:""},
+{id:56, name:"محمد مدحت المزين",              level:"ربع القرآن", w:false, date:""},
+{id:57, name:"سعيد عوني سعيد معوض",            level:"ربع القرآن", w:false, date:""},
+{id:58, name:"احمد محمد معوض",               level:"ربع القرآن", w:false, date:""},
+{id:59, name:"محمد محمد قاسم",               level:"ربع القرآن", w:false, date:""},
+{id:60, name:"ياسين محمد رضوان",              level:"ربع القرآن", w:false, date:""},
+{id:61, name:"يوسف السيد رضوان",              level:"ربع القرآن", w:false, date:""},
+{id:62, name:"محمد السيد الصباغ",             level:"ربع القرآن", w:false, date:""},
+{id:63, name:"عمر ابراهيم رضوان",             level:"ربع القرآن", w:false, date:""},
+{id:64, name:"محمد هاني شوقي قاسم",           level:"ربع القرآن", w:false, date:""},
+{id:65, name:"فارس احمد نعناعه",              level:"ربع القرآن", w:false, date:""},
+{id:66, name:"محمد عبدالحكيم جادو",            level:"ربع القرآن", w:false, date:""},
+{id:67, name:"محمد جمعه محمد المزين",          level:"ربع القرآن", w:false, date:""},
+{id:68, name:"يوسف ايمن حتحوت",              level:"ربع القرآن", w:false, date:""},
+{id:69, name:"محمد عبدالمنعم زاهر",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:70, name:"محمد ابوالوفا زغلول",            level:"ربع القرآن", w:false, date:""},
+{id:71, name:"عمر ابوالوفا زغلول",             level:"ربع القرآن", w:false, date:""},
+{id:72, name:"عمر محمد نعيم",                level:"ربع القرآن", w:false, date:""},
+{id:73, name:"محمود السيد محمود نعيم",         level:"ربع القرآن", w:false, date:""},
+{id:74, name:"ياسين محمد رجب شداد",            level:"ربع القرآن", w:false, date:""},
+{id:75, name:"مالك محمد الطباخ",              level:"ربع القرآن", w:false, date:""},
+{id:76, name:"ملهم علاء القاضي",              level:"ربع القرآن", w:false, date:""},
+{id:77, name:"اسامه رجب القاضي",              level:"ربع القرآن", w:false, date:""},
+{id:78, name:"عبدالرحمن شفيق البنا",           level:"ربع القرآن", w:false, date:""},
+{id:79, name:"يوسف السيد اسماعيل عمران",       level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:80, name:"احمد السيد اسماعيل عمران",       level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:81, name:"فؤاد اسماعيل ابوقوره",           level:"ربع القرآن", w:false, date:""},
+{id:82, name:"يس حماده دعس",                 level:"ربع القرآن", w:false, date:""},
+{id:83, name:"خالد عبدالله ربيع",             level:"ربع القرآن", w:false, date:""},
+
+// ══════════════════════════════════════════════════════
+// المستوى الرابع — ربع القرآن — بنات (99 طالبة)
+// ══════════════════════════════════════════════════════
+{id:1,  name:"منه محمد ربيع",                level:"ربع القرآن", w:false, date:""},
+{id:2,  name:"رفيدا شعبان جادو",              level:"ربع القرآن", w:false, date:""},
+{id:3,  name:"مريم جمعه رضوان",              level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:4,  name:"ريماس اشرف خليل",              level:"ربع القرآن", w:false, date:""},
+{id:5,  name:"ملك عبدالفتاح جادو",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:6,  name:"رويدا شعبان جادو",              level:"ربع القرآن", w:false, date:""},
+{id:7,  name:"جني ماهر علي شحاته",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:8,  name:"خديجه عبدالرحمن ابوشمه",        level:"ربع القرآن", w:false, date:""},
+{id:9,  name:"جني عبدالرحمن داود",            level:"ربع القرآن", w:false, date:""},
+{id:10, name:"رقيه يوسف يوسف نعيم",           level:"ربع القرآن", w:false, date:""},
+{id:11, name:"جني محمد احمد ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:12, name:"ماريا صبحي زغلول",              level:"ربع القرآن", w:false, date:""},
+{id:13, name:"شهد محمد محمد عمران",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:14, name:"جني السيد القاضي",              level:"ربع القرآن", w:false, date:""},
+{id:15, name:"مي حماده رشاد ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:16, name:"عائشه عبدالله المزين",           level:"ربع القرآن", w:false, date:""},
+{id:17, name:"ساندي رمضان ربيع",              level:"ربع القرآن", w:false, date:""},
+{id:18, name:"فاطمه محمود الصباغ",            level:"ربع القرآن", w:false, date:""},
+{id:19, name:"مريم مصطفي عمران",              level:"ربع القرآن", w:false, date:""},
+{id:20, name:"جنا احمد جلال ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:21, name:"عائشه محمد جمعه شحاته",          level:"ربع القرآن", w:false, date:""},
+{id:22, name:"فرح عرفه رمضان ربيع",           level:"ربع القرآن", w:false, date:""},
+{id:23, name:"هدير حسن عكاريش",              level:"ربع القرآن", w:false, date:""},
+{id:24, name:"رغد عبدالله عمران",             level:"ربع القرآن", w:false, date:""},
+{id:25, name:"رنا محمد مرسي",                level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:26, name:"اسماء مبروك جادو",              level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:27, name:"علياء محمد عبدالعليم عبيد",      level:"ربع القرآن", w:false, date:""},
+{id:28, name:"ملك باسم محروس جادو",            level:"ربع القرآن", w:false, date:""},
+{id:29, name:"يمني حماده شعبان سرور",          level:"ربع القرآن", w:false, date:""},
+{id:30, name:"ميرنا هاني مبروك محمد",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:31, name:"اسراء الشحات البدوي",            level:"ربع القرآن", w:false, date:""},
+{id:32, name:"اسماء هيثم محمد عشره",           level:"ربع القرآن", w:false, date:""},
+{id:33, name:"رودينا محمد ابراهيم جادو",        level:"ربع القرآن", w:false, date:""},
+{id:34, name:"رنا محمد ابراهيم جادو",          level:"ربع القرآن", w:false, date:""},
+{id:35, name:"ياسين شلبي حسونه",              level:"ربع القرآن", w:false, date:""},
+{id:36, name:"حبيبه عبدالله حسونه",            level:"ربع القرآن", w:false, date:""},
+{id:37, name:"سجده حسام عبدالحي عماره",         level:"ربع القرآن", w:false, date:""},
+{id:38, name:"رؤي احمد ابراهيم جادو",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:39, name:"مريم محمد جمال عماره",           level:"ربع القرآن", w:false, date:""},
+{id:40, name:"دنيا هاني بسيوني معوض",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:41, name:"عائشه ابراهيم ابوالخير",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:42, name:"اسراء علي محمد عيسوي",           level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:43, name:"ملك وليد رجب السهرجتي",           level:"ربع القرآن", w:false, date:""},
+{id:44, name:"ملك سامح احمد داود",             level:"ربع القرآن", w:false, date:""},
+{id:45, name:"روفان شريف علي جادو",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:46, name:"سلمي العربي محمد داود",           level:"ربع القرآن", w:false, date:""},
+{id:47, name:"الاء علي محمد علي عمران",         level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:48, name:"افنان عادل جمعه الشرقاوي",        level:"ربع القرآن", w:false, date:""},
+{id:49, name:"ريناد علي رمضان ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:50, name:"رويدا علي رمضان ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:51, name:"رقيه محمد شوقي قاسم",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:52, name:"امنيه محمد عادل الصياد",          level:"ربع القرآن", w:false, date:""},
+{id:53, name:"اسيل عبدالمنعم سمير زاهر",        level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:54, name:"اسيل محمد شعبان نعناعه",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:55, name:"مريم عزمي صبحي ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:56, name:"رحمه مشير حرموش",               level:"ربع القرآن", w:false, date:""},
+{id:57, name:"جنا رضا العجواني",               level:"ربع القرآن", w:false, date:""},
+{id:58, name:"جنا ابراهيم علي معوض",            level:"ربع القرآن", w:false, date:""},
+{id:59, name:"والاء محمد عبدالوهاب ربيع",        level:"ربع القرآن", w:false, date:""},
+{id:60, name:"هاجر محمد جلال ربيع",             level:"ربع القرآن", w:false, date:""},
+{id:61, name:"سلمي حماده ابوبكر قمر",           level:"ربع القرآن", w:false, date:""},
+{id:62, name:"نور احمد محمد شحاته",             level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:63, name:"سما وليد سعيد قمر",              level:"ربع القرآن", w:false, date:""},
+{id:64, name:"سجي سامي ابراهيم القط",           level:"ربع القرآن", w:false, date:""},
+{id:65, name:"حنين رمضان العجواني",             level:"ربع القرآن", w:false, date:""},
+{id:66, name:"فاطمه الصافي جادو",              level:"ربع القرآن", w:false, date:""},
+{id:67, name:"رشا سامح محمد البنا",             level:"ربع القرآن", w:false, date:""},
+{id:68, name:"شيماء محمد علي السخاوي",          level:"ربع القرآن", w:false, date:""},
+{id:69, name:"رودينا محمد علي سرور",            level:"ربع القرآن", w:false, date:""},
+{id:70, name:"ندا عماد الدين ربيع",             level:"ربع القرآن", w:false, date:""},
+{id:71, name:"حبيبه عبدالرحمن ابوشمه",          level:"ربع القرآن", w:false, date:""},
+{id:72, name:"روان عماد الدين ربيع",            level:"ربع القرآن", w:false, date:""},
+{id:73, name:"ياسمين محمد خطاب",               level:"ربع القرآن", w:false, date:""},
+{id:74, name:"رنا عماد الدين ربيع",             level:"ربع القرآن", w:false, date:""},
+{id:75, name:"سلمي محمد محمد قوقع",             level:"ربع القرآن", w:false, date:""},
+{id:76, name:"اروي جمال محمود الصعيدي",          level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:77, name:"حبيبه رجب اسماعيل شرعان",          level:"ربع القرآن", w:false, date:""},
+{id:78, name:"امل محمد وفا الطباخ",             level:"ربع القرآن", w:false, date:""},
+{id:79, name:"نورهان علي محمد رضوان",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:80, name:"حبيبه علي محمد شحاته",             level:"ربع القرآن", w:false, date:""},
+{id:81, name:"علياء ياسر محمد رضوان",            level:"ربع القرآن", w:false, date:""},
+{id:82, name:"اريج حاتم محمد معوض",             level:"ربع القرآن", w:false, date:""},
+{id:83, name:"ملك محمد فؤاد العجواني",           level:"ربع القرآن", w:false, date:""},
+{id:84, name:"رنا جميل مصطفي هاشم",             level:"ربع القرآن", w:false, date:""},
+{id:85, name:"مريم عبدالله زغلول",              level:"ربع القرآن", w:false, date:""},
+{id:86, name:"ندي علاء جمال معوض",              level:"ربع القرآن", w:false, date:""},
+{id:87, name:"تسنيم صالح رشاد المزين",           level:"ربع القرآن", w:false, date:""},
+{id:88, name:"الاء حاتم حسن نعناعه",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:89, name:"هنا محمد بسيوني شحاته",            level:"ربع القرآن", w:false, date:""},
+{id:90, name:"ريتال محمد علي السعيد المزين",      level:"ربع القرآن", w:false, date:""},
+{id:91, name:"تقي احمد محمد منصور شريف",          level:"ربع القرآن", w:false, date:""},
+{id:92, name:"هاجر محمد صبحي ربيع",              level:"ربع القرآن", w:false, date:""},
+{id:93, name:"منة الله بشير العزازي",             level:"ربع القرآن", w:false, date:""},
+{id:94, name:"مريم عابد العزازي",               level:"ربع القرآن", w:false, date:""},
+{id:95, name:"مريم محمد السيد خطاب",             level:"ربع القرآن", w:false, date:""},
+{id:96, name:"الين احمد حتحوت",                level:"ربع القرآن", w:false, date:""},
+{id:97, name:"ملك ايمن حتحوت",                 level:"ربع القرآن", w:false, date:""},
+{id:98, name:"رحاب جمعه محمد المزين",            level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+{id:99, name:"ايه عبدالحميد داود",              level:"ربع القرآن", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العصر"},
+
+// ══════════════════════════════════════════════════════
+// المستوى الخامس — ثلاثة أجزاء (250 طالب من الـ PDF)
+// ══════════════════════════════════════════════════════
+{id:1,  name:"ايسل حمدي علي زغلول",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:2,  name:"حنين فتحي السهرجتي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:3,  name:"الزهراء السيد اصيل",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:4,  name:"عبدالعزيز علاء معوض",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:5,  name:"كرم علاء معوض",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:6,  name:"محمد اسلام جادو",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:7,  name:"اروي محمد المزين",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:8,  name:"رفيده طارق الغنيمي سالم",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:9,  name:"رقيه طارق الغنيمي سالم",           level:"ثلاثة أجزاء", w:false, date:""},
+{id:10, name:"ايه امين سمير زاهر",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:11, name:"رافال احمد محمد داود",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:12, name:"السيد فتحي السهرجتي",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:13, name:"مريم بشير محمد سرور",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:14, name:"محمد احمد الطباخ",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:15, name:"عبدالله محمد جابر نعناعه",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:16, name:"محمد عبدالله كامل المزين",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:17, name:"روفان اسامه عماره",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:18, name:"جمال محمد القاضي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:19, name:"رقيه سعيد محمد صديق",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:20, name:"بسمله وليد سرور",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:21, name:"محمد وليد محمد داود",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:22, name:"سجده حماده دعس",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:23, name:"سلمي السيد عمران",               level:"ثلاثة أجزاء", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:24, name:"فاطمه عبدالرحمن زاهر",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:25, name:"نورين احمد علي قمر",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:26, name:"عمر محمد السيد خطاب",             level:"ثلاثة أجزاء", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:27, name:"ملك محمد امام داود",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:28, name:"عمر سراج جلال ربيع",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:29, name:"عائشه جمعه رضوان",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:30, name:"عبدالرحمن مبروك الشرقاوي",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:31, name:"موده محمد يونس داود",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:32, name:"روفان وليد مجدي طه",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:33, name:"موده علي اسماعيل دعس",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:34, name:"احمد سعد عبدالرحمن معوض",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:35, name:"رغد علي عبدالسلام رضوان",          level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:36, name:"نور جمال حجازي زاهر",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:37, name:"اشواق عيد محمد دعس",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:38, name:"الاء وفا محمود زغلول",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:39, name:"عمر وفا محمود زغلول",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:40, name:"محمد علاء جمال معوض",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:41, name:"يحي السعودي منصور العربي",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:42, name:"مالك محمد سيد البنا",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:43, name:"مني مؤمن عبدالله خطاب",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:44, name:"ايه جلال فؤاد محمد محمود",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:45, name:"مكه ابراهيم سيد البنا",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:46, name:"انس شعبان السعيد داود",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:47, name:"اياد علي السيد القاضي",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:48, name:"عمر محمد جمعه النجار",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:49, name:"محمد عابد العزازي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:50, name:"ماريا امير علي قاسم",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:51, name:"رؤي عبدالله داود",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:52, name:"لينا احمد محمد شريف",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:53, name:"محمود محي ابوالجدايل",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:54, name:"مي هاني جمال ربيع",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:55, name:"رودينه محمد المزين",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:56, name:"خديجه حماده شداد",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:57, name:"اياد ياسر الصباغ",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:58, name:"احمد عصام ابوالجدايل",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:59, name:"عبيده حسام المزين",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:60, name:"رحيل رمضان شداد",                level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:61, name:"كارما حماده شداد",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:62, name:"ياسمين احمد الصباغ",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:63, name:"مالك محمد سمير زاهر",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:64, name:"مازن احمد معوض",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:65, name:"محمود شعبان داود",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:66, name:"يارا احمد البنا",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:67, name:"حبيبه احمد نعيم",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:68, name:"فرح احمد نعيم",                 level:"ثلاثة أجزاء", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:69, name:"رغد محمد سيد البنا",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:70, name:"لما ابراهيم سيد البنا",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:71, name:"هيام ماهر الغنيمي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:72, name:"احمد حماده شداد",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:73, name:"ريماس عبدالحق جادو",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:74, name:"حنين علاء دعس",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:75, name:"محمد ضياء حمدان",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:76, name:"مصطفي ضياء حمدان",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:77, name:"ندي رزق محمد نعناعه",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:78, name:"رقيه حماده ابوهلال",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:79, name:"محمد علي حمزه ابوالجدايل",         level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:80, name:"ادم مصطفي حامد حيدر",             level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:81, name:"ندين حسام مبروك",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:82, name:"رودينا احمد فؤاد رضوان",           level:"ثلاثة أجزاء", w:false, date:""},
+{id:83, name:"يوسف مدحت المزين",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:84, name:"مريم ايمن الشحات سرور",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:85, name:"حبيبه ابوطالب داود",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:86, name:"جودي محمد شعبان نعناعه",           level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:87, name:"رنا ماهر ابوالجدايل",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:88, name:"احمد عبدالحكيم جادو",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:89, name:"عمر وائل ابوالجدايل",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:90, name:"هنا محمد عبدالتواب الطباخ",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:91, name:"عبدالله وليد حيدر",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:92, name:"احمد عابد ابراهيم داود",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:93, name:"محمد اشرف الشرقاوي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:94, name:"ساجد محمد الشرقاوي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:95, name:"مريم عبدالرحمن ربيع",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:96, name:"الزهراء عبدالله عمران",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:97, name:"عبدالعزيز محمد مرسي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:98, name:"محمد علي محمد صديق",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:99, name:"محمد احمد محمد رضوان",             level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:100,name:"حسام ربيع ربيع",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:101,name:"موده محمد قمر",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:102,name:"عمر محمد رضوان",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:103,name:"هبه احمد بسيوني شحاته",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:104,name:"مكه محمد العربي",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:105,name:"امنيه احمد نعناعه",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:106,name:"حسن علي رضوان",                  level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:107,name:"شيماء هاني قاسم",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:108,name:"منه احمد الشناوي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:109,name:"مالك جمعه البنا",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:110,name:"كريم قطب ربيع",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:111,name:"ايه محمد عبدالوهاب ربيع",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:112,name:"مريم علي سرور",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:113,name:"اسيل محمد عماد عمران",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:114,name:"بسمله وليد سرور",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:115,name:"هنا محمد محمد نعناعه",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:116,name:"محمد السيد عمران",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:117,name:"رودينا عبدالله خطاب",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:118,name:"هند رمضان العجواني",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:119,name:"ريماس عبدالله خطاب",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:120,name:"جنا السيد عمران",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:121,name:"نورين اسعد معوض",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:122,name:"لانا احمد محمد زغلول",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:123,name:"محمود رجب عمران",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:124,name:"جودي رضا العجواني",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:125,name:"فريده عيسوي دعس",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:126,name:"سما محمود سرور",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:127,name:"احمد ذكريا جادو",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:128,name:"ريناد حازم داوود",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:129,name:"جنه مراد ربيع",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:130,name:"ملك عبدالمجيد المزين",             level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:131,name:"عمر محمد رضوان",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:132,name:"ريناد هاني مبروك",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:133,name:"ياسمين حماده سرور",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:134,name:"محمد محمد علي المزين",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:135,name:"ادم عابد العزازي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:136,name:"بسمه اسماعيل ابوقوره",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:137,name:"ورده بشير العزازي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:138,name:"سجده ايهاب الصباغ",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:139,name:"ايسل عمر داوود",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:140,name:"ياسين عادل الشرقاوي",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:141,name:"مريم احمد عبدالعزيز مرسي",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:142,name:"رقيه سعيد ماجد المزين",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:143,name:"سيف عمر حتحوت",                  level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:144,name:"دارين محمد زغلول",               level:"ثلاثة أجزاء", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:145,name:"ياسمين علي حتحوت",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:146,name:"يوسف سعيد نعيم",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:147,name:"فرحه محمد الرشيدي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:148,name:"مريم عبدالرحمن داوود",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:149,name:"سما محمد خطاب",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:150,name:"رقيه رمضان رضوان",               level:"ثلاثة أجزاء", w:true, date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:151,name:"محمود علاء قاسم",                level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:152,name:"عبدالرحمن محمد زغلول",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:153,name:"محمد مصطفي يونس",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:154,name:"حمزه خالد زغلول",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:155,name:"ريناد نصر زغلول",                level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:156,name:"اسماء عبدالله الشهاوي",           level:"ثلاثة أجزاء", w:false, date:""},
+{id:157,name:"الاء محمد السهرجتي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:158,name:"سجي محمد الشرقاوي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:159,name:"اسيل بسيوني القاضي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:160,name:"اروه عبده جمال عماره",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:161,name:"مصري محمد جادو",                 level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:162,name:"ايه عرفه داوود",                 level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:163,name:"محمد علي المصري جادو",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:164,name:"احمد محمد ربيع",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:165,name:"مصطفي محمد ربيع",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:166,name:"عادل محمد الصياد",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:167,name:"مازن شفيق البنا",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:168,name:"محمد رجب عبدالمعطي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:169,name:"رهف محمد مرجان",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:170,name:"سلمي نصر الطباخ",                level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:171,name:"بسيوني كريم معوض",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:172,name:"مكه وليد السهرجتي",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:173,name:"محمد السيد رضوان",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:174,name:"رودينا محمد داوود",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:175,name:"محمد محمود شحاته",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:176,name:"اسماء محمود شحاته",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:177,name:"رفيق هشام ابوشمه",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:178,name:"رهف هشام ابوشمه",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:179,name:"ادم علاء ابوشمه",                level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:180,name:"فاطمه عبدالرحمن ابوشمه",          level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:181,name:"محمد كمال الشناوي",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:182,name:"عمر محمد قاسم",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:183,name:"عمر علي حلمي رضوان",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:184,name:"اياد اشرف داوود",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:185,name:"محمد احمد عبداللطيف شحاته",        level:"ثلاثة أجزاء", w:false, date:""},
+{id:186,name:"رودينا عبدالله القط",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:187,name:"ملك فتح الله البحيري",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:188,name:"جنه جمال الصعيدي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:189,name:"نور محمد ابراهيم شحاته",           level:"ثلاثة أجزاء", w:false, date:""},
+{id:190,name:"عبدالله اشرف حسن داوود",           level:"ثلاثة أجزاء", w:false, date:""},
+{id:191,name:"علاء سيد دعبس",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:192,name:"ياسين احمد صبحي جادو",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:193,name:"ندي محمد ربيع",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:194,name:"زياد محمد معوض",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:195,name:"لينا عبدالفتاح جادو",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:196,name:"اشرقت محمد داوود",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:197,name:"سجي ادهم معوض",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:198,name:"سليين مبروك علي اصيل",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:199,name:"جمال جلال ربيع",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:200,name:"زياد ادهم معوض",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:201,name:"احمد ماهر سعد ربيع",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:202,name:"شمس عبدالله شحاته",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:203,name:"عبدالتواب عبدالله الطباخ",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:204,name:"سما محمد شحاته",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:205,name:"تقي احمد شحاته",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:206,name:"جني محمد شحاته",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:207,name:"مكه محمد شحاته",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:208,name:"حمزه محمد الشحات سرور",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:209,name:"مريم حسين شريف",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:210,name:"انس احمد الشحات سرور",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:211,name:"هدي السيد العادلي",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:212,name:"اسماء عبدالمحسن مغيني",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:213,name:"اسماء محمد ابراهيم معوض",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:214,name:"ادم قطب شرعان",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:215,name:"ريان علي سرور",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:216,name:"حنين احمد خطاب",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:217,name:"انس سالم سعد صديق",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:218,name:"محمد احمد الدنش",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:219,name:"اكرم محمد داوود",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:220,name:"ادم رمضان شحاته",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:221,name:"حفصه ابراهيم شاهين",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:222,name:"زياد محمد رمضان معوض",             level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:223,name:"رقيه محمد هاشم",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:224,name:"شروق شاكر دعس",                  level:"ثلاثة أجزاء", w:false, date:""},
+{id:225,name:"مني محمد حسونه",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:226,name:"احمد عبدالمولي المزين",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:227,name:"فارس محمد حسونه",                level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:228,name:"عمر محمد محمد المزين",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:229,name:"ايمان رجب المزين",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:230,name:"زياد عبدالرحمن نعناعه",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:231,name:"رقيه كمال الشناوي",               level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:232,name:"منه السيد نعيم",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:233,name:"منه احمد الشناوي",               level:"ثلاثة أجزاء", w:false, date:""},
+{id:234,name:"محمد اشرف شحاته",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:235,name:"محمد كامل رضوان",                level:"ثلاثة أجزاء", w:false, date:""},
+{id:236,name:"سلمي لطفي عبدالنبي شحاته",         level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:237,name:"احمد محمد اصيل",                 level:"ثلاثة أجزاء", w:false, date:""},
+{id:238,name:"احمد محمد عبدالعزيز نعناعه",       level:"ثلاثة أجزاء", w:false, date:""},
+{id:239,name:"نادين اسعد عيد معوض",             level:"ثلاثة أجزاء", w:false, date:""},
+{id:240,name:"محمد عبدالله قنديل حسونه",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:241,name:"ياسين محمد حسن نعناعه",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:242,name:"انس مصطفي السيد البدوي",            level:"ثلاثة أجزاء", w:false, date:""},
+{id:243,name:"رحمه محمد عبدالعزيز رضوان",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:244,name:"سما احمد عبدالتواب زغلول",          level:"ثلاثة أجزاء", w:false, date:""},
+{id:245,name:"رودينا علي رجب القاضي",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:246,name:"ايسل زين صبحي غنيم",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:247,name:"ايسل وليد مصطفي ابوشويكه",         level:"ثلاثة أجزاء", w:false, date:""},
+{id:248,name:"رقيه احمد ابراهيم جادو",           level:"ثلاثة أجزاء", w:false, date:""},
+{id:249,name:"جودي رفعت نصر داوود",              level:"ثلاثة أجزاء", w:false, date:""},
+{id:250,name:"عائشه احمد قمر",                 level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:251,name:"تميم محمد خالد نعناعه",          level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:252,name:"عمر علاء رجب القاضي",             level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:253,name:"عائشه محمد عبدالمجيد نعيم",        level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:254,name:"كارما محمد خطاب",                  level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:255,name:"رقيه سعيد مجدي المزين",            level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:256,name:"مريم عبدالرحمن عبدالوهاب ربيع",    level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:257,name:"اروي عيده جمال عماره",             level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+{id:258,name:"جنه محمد عباده داود",              level:"ثلاثة أجزاء", w:true,  date:"الخميس ٢٢ رمضان — بعد صلاة العشاء"},
+];
+
+
+// ── إحصائيات ──
+document.getElementById('statTotal').textContent = S.length;
+document.getElementById('statWin').textContent   = S.filter(s=>s.w).length;
+document.getElementById('statFail').textContent  = S.filter(s=>!s.w).length;
+
+function N(s){return s.replace(/[أإآا]/g,'ا').replace(/[ةه]/g,'ه').replace(/[يى]/g,'ي').replace(/\s+/g,' ').trim();}
+
+function doSearch(val){
+  const q=N(val.trim()), area=document.getElementById('resultArea');
+  if(q.length<2){area.innerHTML='';return;}
+  const res=S.filter(s=>N(s.name).includes(q));
+  if(!res.length){
+    area.innerHTML='<div class="not-found"><div class="not-found-icon">🔍</div><div class="not-found-text">الاسم مش موجود في القائمة</div><div class="not-found-sub">تأكد من كتابة الاسم صح أو راجع المنظمين</div></div>';
+    return;
+  }
+  area.innerHTML=res.map(s=>{
+    const i=S.indexOf(s);
+    const icon=s.w?'🏆':'📋';
+    const sub=s.w?'مرشح للتكريم — اضغط لعرض البطاقة':'مشارك — اضغط لعرض البطاقة';
+    return `<div class="result-card" onclick="showCard(${i})"><div class="rc-name">${icon} ${s.name}</div><div class="rc-level">📖 ${s.level}</div><div class="rc-hint">${sub}</div></div>`;
+  }).join('');
+}
+
+function showCard(idx){
+  const s=S[idx];
+  const card=document.getElementById('theCard');
+  const banner=document.getElementById('statusBanner');
+  document.getElementById('cardId').textContent=s.id;
+  document.getElementById('cardName').textContent=s.name;
+  document.getElementById('cardLevel').textContent=s.level;
+
+  if(s.w){
+    card.classList.remove('fail-card');
+    banner.className='status-banner win';
+    document.getElementById('statusIcon').textContent='🏆';
+    document.getElementById('statusText').textContent='مبروك! اسمك في قائمة المرشحين للتكريم';
+    document.getElementById('cardTitle').textContent='حَفْلُ تَكْرِيمِ حُفَّاظِ الْقُرْآنِ الْكَرِيمِ';
+    document.getElementById('cardGlow').className='card-glow';
+    document.getElementById('cbo').className='card-border-outer';
+    document.getElementById('cbm').className='card-border-main';
+    document.getElementById('hintBar').className='hint-bar';
+    document.getElementById('hintBar').innerHTML='📸 خد <span style="color:var(--gold);font-weight:500">screenshot</span> للبطاقة دي — هتحتاجها يوم حفل التكريم كارنيه';
+    document.getElementById('cardInfo').innerHTML=`
+      <div class="info-row"><span class="info-row-icon">📅</span><span class="info-row-label">موعد التكريم</span><span class="info-row-val">${s.date}</span></div>
+      <div class="info-row"><span class="info-row-icon">🕌</span><span class="info-row-label">المكان</span><span class="info-row-val">المسجد البحري — قرية قونة</span></div>`;
+  } else {
+    card.classList.add('fail-card');
+    banner.className='status-banner lose';
+    document.getElementById('statusIcon').textContent='📖';
+    document.getElementById('statusText').textContent='جزاك الله خيراً على مشاركتك — جهدك محفوظ عند الله';
+    document.getElementById('cardTitle').textContent='المسابقة السنوية لحفظ القرآن الكريم';
+    document.getElementById('cardGlow').className='card-glow fail-glow';
+    document.getElementById('cbo').className='card-border-outer fail-b';
+    document.getElementById('cbm').className='card-border-main fail-b';
+    document.getElementById('hintBar').className='hint-bar fail-hint';
+    document.getElementById('hintBar').innerHTML='🌟 الحافظ الصادق لا يضيع جهده — واصل طريقك وشاركنا العام القادم';
+    document.getElementById('cardInfo').innerHTML=`
+      <div class="info-row"><span class="info-row-icon">📖</span><span class="info-row-label">الحالة</span><span class="info-row-val">شارك ولم يتأهل للتكريم هذا العام</span></div>
+      <div class="info-row"><span class="info-row-icon">🕌</span><span class="info-row-label">المسابقة</span><span class="info-row-val">المسجد البحري — قرية قونة</span></div>`;
+  }
+  document.getElementById('searchPage').style.display='none';
+  const p=document.getElementById('idPage');
+  p.style.display='flex'; p.classList.add('active');
+  drawBg(s.w); window.scrollTo(0,0);
+}
+
+function goBack(){
+  document.getElementById('searchPage').style.display='';
+  const p=document.getElementById('idPage');
+  p.classList.remove('active'); p.style.display='none';
+}
+
+function drawBg(win){
+  const svg=document.getElementById('cardBgSvg'); svg.innerHTML='';
+  const ns='http://www.w3.org/2000/svg';
+  const col=win?'rgba(196,155,55,0.09)':'rgba(120,80,180,0.09)';
+  const vc=win?'rgba(5,14,26,0.8)':'rgba(14,10,20,0.8)';
+  function st(cx,cy,R){const r=R*.37;let d='';for(let i=0;i<16;i++){const a=Math.PI/8*i-Math.PI/2,rad=i%2?r:R;d+=(i?'L':'M')+(cx+rad*Math.cos(a)).toFixed(1)+','+(cy+rad*Math.sin(a)).toFixed(1);}return d+'Z';}
+  const g=document.createElementNS(ns,'g');g.setAttribute('fill','none');g.setAttribute('stroke',col);g.setAttribute('stroke-width','0.7');
+  for(let r=-1;r<10;r++)for(let c=-1;c<14;c++){const p=document.createElementNS(ns,'path');p.setAttribute('d',st(c*40+20,r*40+20,16));g.appendChild(p);}
+  svg.appendChild(g);
+  const defs=document.createElementNS(ns,'defs'),rg=document.createElementNS(ns,'radialGradient');
+  rg.setAttribute('id','cv');rg.setAttribute('cx','50%');rg.setAttribute('cy','50%');rg.setAttribute('r','70%');
+  [[0,'rgba(0,0,0,0)'],[1,vc]].forEach(([o,c])=>{const s=document.createElementNS(ns,'stop');s.setAttribute('offset',o);s.setAttribute('stop-color',c);rg.appendChild(s);});
+  defs.appendChild(rg);svg.appendChild(defs);
+  const rect=document.createElementNS(ns,'rect');rect.setAttribute('x','0');rect.setAttribute('y','0');rect.setAttribute('width','520');rect.setAttribute('height','360');rect.setAttribute('fill','url(#cv)');svg.appendChild(rect);
+}
+</script>
+</body>
+</html>
