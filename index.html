@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Publishing Suite — A.Y Technology</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ─── CSS VARS ─── */
+    :root {
+      --bg:          #050e17;
+      --bg2:         #07131f;
+      --bg3:         #0a1c2e;
+      --acc:         #0fbbff;
+      --acc2:        #0891c8;
+      --glow:        rgba(15,187,255,0.22);
+      --border:      rgba(15,187,255,0.14);
+      --tx:          #e8f4fd;
+      --txm:         #5f8099;
+      --paper-bg:    #ffffff;
+      --paper-tx:    #1a1a1a;
+      --paper-bd:    #d1d5db;
+    }
+
+    /* ─── GLOBAL ─── */
+    html, body {
+      height: 100%;
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      direction: rtl;
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(15,187,255,0.25); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--acc); }
+
+    /* ─── LAYOUT ─── */
+    #app {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ────────────────────────────────────────────
+       SIDEBAR  (right side — first child in RTL)
+    ──────────────────────────────────────────── */
+    #sidebar {
+      width: 280px;
+      min-width: 280px;
+      max-width: 280px;
+      height: 100vh;
+      background: var(--bg2);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+      order: 2;        /* right side */
+      flex-shrink: 0;
+    }
+
+    /* subtle glow strip on left edge of sidebar */
+    #sidebar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 1px; height: 100%;
+      background: linear-gradient(to bottom, transparent 0%, var(--acc) 50%, transparent 100%);
+      opacity: 0.35;
+    }
+
+    /* ── brand ── */
+    .sb-brand {
+      padding: 18px 16px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .sb-brand-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .sb-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--acc), var(--acc2));
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 18px var(--glow);
+      flex-shrink: 0;
+    }
+    .sb-brand-name { font-size: 13px; font-weight: 800; line-height: 1.25; }
+    .sb-brand-sub  { font-size: 10px; color: var(--acc); font-weight: 600; letter-spacing: .5px; }
+
+    /* ── add-book button ── */
+    #btn-add-book {
+      width: 100%;
+      padding: 11px 14px;
+      border: none; border-radius: 11px;
+      background: linear-gradient(135deg, var(--acc) 0%, #0060a0 100%);
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13.5px; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+      position: relative; overflow: hidden;
+      transition: transform .25s, box-shadow .25s;
+      box-shadow: 0 4px 22px var(--glow);
+    }
+    #btn-add-book::before {
+      content: '';
+      position: absolute; top: 0; right: -100%;
+      width: 55%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+      transition: right .55s;
+    }
+    #btn-add-book:hover::before { right: 150%; }
+    #btn-add-book:hover { transform: translateY(-1px); box-shadow: 0 7px 28px rgba(15,187,255,.45); }
+    #btn-add-book:active { transform: translateY(0); }
+
+    /* ── book list ── */
+    #sb-books {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 8px;
+    }
+
+    .sb-empty {
+      padding: 30px 12px;
+      text-align: center;
+      color: var(--txm);
+      font-size: 12px;
+      line-height: 2;
+    }
+
+    .book-wrap { margin-bottom: 5px; border-radius: 11px; border: 1px solid transparent; transition: border-color .2s; }
+    .book-wrap:hover { border-color: var(--border); }
+    .book-wrap.active { border-color: rgba(15,187,255,.28); }
+
+    .book-hdr {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 11px;
+      background: var(--bg3);
+      border-radius: 11px;
+      cursor: pointer;
+      user-select: none;
+      transition: background .2s;
+    }
+    .book-hdr:hover { background: rgba(15,187,255,.08); }
+    .book-wrap.active .book-hdr { background: rgba(15,187,255,.13); }
+
+    .book-ico   { font-size: 15px; flex-shrink: 0; }
+    .book-lbl   { flex: 1; font-size: 12.5px; font-weight: 600; }
+    .book-arr   { font-size: 11px; color: var(--txm); transition: transform .2s; }
+    .book-wrap.open .book-arr { transform: rotate(90deg); }
+
+    .book-chs { display: none; padding: 3px 6px 6px; }
+    .book-wrap.open .book-chs { display: block; }
+
+    .ch-item {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 10px; border-radius: 8px;
+      cursor: pointer; font-size: 12px; color: var(--txm);
+      transition: all .18s; margin-bottom: 1px;
+    }
+    .ch-item:hover  { background: rgba(15,187,255,.07); color: var(--acc); }
+    .ch-item.active { background: rgba(15,187,255,.14); color: var(--acc); font-weight: 700; }
+    .ch-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--txm); flex-shrink: 0; transition: all .18s;
+    }
+    .ch-item:hover .ch-dot, .ch-item.active .ch-dot {
+      background: var(--acc); box-shadow: 0 0 6px var(--acc);
+    }
+
+    .btn-add-ch {
+      width: 100%; margin-top: 4px;
+      padding: 6px 10px; border-radius: 8px;
+      border: 1px dashed rgba(15,187,255,.28);
+      background: transparent; color: var(--txm);
+      font-family: 'Cairo', sans-serif; font-size: 11.5px;
+      cursor: pointer; transition: all .18s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .btn-add-ch:hover { border-color: var(--acc); color: var(--acc); background: rgba(15,187,255,.05); }
+
+    /* ── sidebar footer ── */
+    .sb-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 9px;
+    }
+
+    .pm-label { font-size: 10.5px; color: var(--txm); font-weight: 600; text-align: center; }
+
+    .pm-row { display: flex; gap: 5px; }
+    .pm-btn {
+      flex: 1; padding: 7px 3px;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: var(--bg3); color: var(--txm);
+      font-family: 'Cairo', sans-serif; font-size: 11px; font-weight: 600;
+      cursor: pointer; transition: all .2s; text-align: center;
+    }
+    .pm-btn:hover, .pm-btn.on {
+      border-color: var(--acc); color: var(--acc);
+      background: rgba(15,187,255,.1); box-shadow: 0 0 10px var(--glow);
+    }
+
+    #btn-pdf {
+      width: 100%; padding: 10px;
+      border: 1px solid var(--acc); border-radius: 10px;
+      background: transparent; color: var(--acc);
+      font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: all .25s;
+      display: flex; align-items: center; justify-content: center; gap: 7px;
+    }
+    #btn-pdf:hover { background: var(--acc); color: #fff; box-shadow: 0 4px 18px var(--glow); }
+
+    /* ────────────────────────────────────────────
+       MAIN  (left side — second child)
+    ──────────────────────────────────────────── */
+    #main {
+      flex: 1;
+      min-width: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      order: 1;        /* left side */
+    }
+
+    /* ── topbar ── */
+    #topbar {
+      height: 52px;
+      min-height: 52px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 18px; gap: 10px;
+      flex-shrink: 0;
+      z-index: 5;
+    }
+    #tb-title   { flex: 1; font-size: 14px; font-weight: 800; }
+    #tb-chapter { font-size: 12px; color: var(--acc); font-weight: 600; }
+    .tb-stat {
+      font-size: 11px; color: var(--txm);
+      background: var(--bg3); border: 1px solid var(--border);
+      padding: 4px 10px; border-radius: 20px;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ── toolbar ── */
+    #toolbar {
+      background: rgba(5,14,23,.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 6px 16px;
+      display: flex; align-items: center; gap: 3px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .t-sep { width: 1px; height: 24px; background: var(--border); margin: 0 5px; flex-shrink: 0; }
+    .t-lbl { font-size: 10px; color: var(--txm); font-weight: 600; padding: 0 3px; }
+
+    .t-btn {
+      width: 32px; height: 32px;
+      border: none; border-radius: 7px;
+      background: transparent; color: var(--tx);
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; position: relative; flex-shrink: 0;
+    }
+    .t-btn svg { width: 15px; height: 15px; pointer-events: none; }
+    .t-btn:hover  { background: rgba(15,187,255,.12); color: var(--acc); }
+    .t-btn.on     { background: rgba(15,187,255,.2);  color: var(--acc); box-shadow: inset 0 0 0 1px rgba(15,187,255,.4); }
+
+    /* tooltip */
+    .t-btn::after {
+      content: attr(data-tip);
+      position: absolute; bottom: calc(100% + 5px); left: 50%;
+      transform: translateX(-50%);
+      background: rgba(4,10,18,.97); border: 1px solid var(--border);
+      color: var(--tx); font-size: 10px; font-weight: 400;
+      padding: 3px 7px; border-radius: 5px;
+      white-space: nowrap; opacity: 0; pointer-events: none;
+      transition: opacity .12s; font-family: 'Cairo', sans-serif;
+      z-index: 99;
+    }
+    .t-btn:hover::after { opacity: 1; }
+
+    .t-sel {
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--tx); font-family: 'Cairo', sans-serif; font-size: 11.5px;
+      padding: 4px 7px; border-radius: 7px; cursor: pointer; outline: none;
+      transition: border-color .18s; flex-shrink: 0;
+    }
+    .t-sel:focus { border-color: var(--acc); }
+
+    .cpick-wrap {
+      position: relative; width: 32px; height: 32px;
+      border-radius: 7px; border: 1px solid var(--border);
+      cursor: pointer; transition: border-color .18s; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .cpick-wrap:hover { border-color: var(--acc); }
+    .cpick-wrap input[type="color"] {
+      position: absolute; top: -4px; left: -4px;
+      width: calc(100% + 8px); height: calc(100% + 8px);
+      border: none; padding: 0; cursor: pointer; opacity: 0;
+    }
+    .cpick-ico {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; pointer-events: none;
+    }
+
+    /* ────────────────────────────────────────────
+       EDITOR CANVAS
+    ──────────────────────────────────────────── */
+    #canvas {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #081420;
+      background-image:
+        radial-gradient(ellipse at 15% 40%, rgba(15,187,255,.05) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 10%, rgba(15,187,255,.04) 0%, transparent 50%);
+      padding: 36px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      /* IMPORTANT: this must scroll, not be hidden */
+    }
+
+    /* ── welcome screen ── */
+    #welcome {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 60vh; gap: 16px; text-align: center;
+    }
+    #welcome .w-icon { font-size: 70px; opacity: .18; }
+    #welcome .w-title { font-size: 20px; font-weight: 800; color: var(--txm); }
+    #welcome .w-sub   { font-size: 13px; color: var(--txm); opacity: .65; max-width: 280px; line-height: 1.8; }
+
+    /* ────────────────────────────────────────────
+       COVER PAGE (special first page of a chapter)
+    ──────────────────────────────────────────── */
+    .a4-cover {
+      width: 210mm;
+      height: 297mm;
+      position: relative;
+      overflow: hidden;
+      border-radius: 3px;
+      box-shadow: 0 0 0 1px var(--paper-bd), 0 10px 48px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.5);
+      background: var(--paper-bg);
+      color: var(--paper-tx);
+      transition: background .3s, color .3s;
+      flex-shrink: 0;
+    }
+
+    /* gradient overlay for cover */
+    .cover-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(15,187,255,.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .cover-top-bar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--acc), var(--acc2));
+    }
+    .cover-bottom-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--acc2), var(--acc));
+    }
+    .cover-body {
+      position: absolute;
+      inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40mm 3cm;
+      text-align: center;
+      direction: rtl;
+    }
+    .cover-publisher {
+      font-size: 11pt;
+      font-weight: 600;
+      color: var(--acc);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20mm;
+      opacity: .85;
+    }
+    .cover-book-title {
+      font-size: 28pt;
+      font-weight: 900;
+      line-height: 1.4;
+      margin-bottom: 8mm;
+      color: var(--paper-tx);
+      word-break: break-word;
+    }
+    .cover-divider {
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--acc), var(--acc2));
+      border-radius: 2px;
+      margin: 0 auto 8mm;
+    }
+    .cover-chapter-label {
+      font-size: 13pt;
+      font-weight: 600;
+      color: var(--txm);
+      margin-bottom: 3mm;
+    }
+    .cover-chapter-title {
+      font-size: 18pt;
+      font-weight: 700;
+      color: var(--paper-tx);
+      word-break: break-word;
+    }
+    .cover-footer {
+      position: absolute;
+      bottom: 14mm;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 9pt;
+      color: var(--txm);
+      font-weight: 500;
+    }
+
+    /* ────────────────────────────────────────────
+       A4 WRITING PAGE
+    ──────────────────────────────────────────── */
+    .a4-page {
+      width: 210mm;
+      min-height: 297mm;
+      position: relative;
+      overflow: visible;
+      border-radius: 3px;
+      box-shadow: 0 0 0 1px var(--paper-bd), 0 10px 48px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.5);
+      background: var(--paper-bg);
+      color: var(--paper-tx);
+      transition: background .3s, color .3s;
+      flex-shrink: 0;
+    }
+
+    /* gutter shading (right = binding side in RTL) */
+    .page-gutter {
+      position: absolute;
+      top: 0; right: 0;
+      width: 3cm; height: 100%;
+      background: rgba(15,187,255,.018);
+      border-left: 1px dashed rgba(15,187,255,.09);
+      pointer-events: none; border-radius: 3px 0 0 3px;
+    }
+
+    /* page rule below header area */
+    .page-rule {
+      position: absolute;
+      top: 17mm; right: 3cm; left: 2cm;
+      height: 1px;
+      background: linear-gradient(to left, var(--paper-bd), transparent);
+      opacity: .45; pointer-events: none;
+    }
+
+    /* page number */
+    .page-num {
+      position: absolute;
+      bottom: 9mm; left: 0; right: 0;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+      font-size: 9.5pt; color: #aaa;
+      pointer-events: none;
+    }
+
+    /* editable content area */
+    .page-body {
+      padding-top: 22mm;
+      padding-bottom: 18mm;
+      padding-right: 3cm;   /* gutter / binding */
+      padding-left:  2cm;   /* outer margin */
+      min-height: 297mm;
+      outline: none;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14pt;
+      line-height: 2.1;
+      color: var(--paper-tx);
+      direction: rtl;
+      text-align: right;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+    .page-body:focus { outline: none; }
+    .page-body:empty::before {
+      content: attr(data-ph);
+      color: #bbb;
+      pointer-events: none;
+    }
+    .page-body h1 {
+      font-size: 22pt; font-weight: 900;
+      margin: 8px 0 12px; line-height: 1.5;
+    }
+    .page-body h2 {
+      font-size: 16pt; font-weight: 700;
+      margin: 6px 0 10px; line-height: 1.6;
+    }
+    .page-body p { margin-bottom: 7px; }
+    .page-body img {
+      max-width: 100%; height: auto;
+      display: block; margin: 10px auto; border-radius: 4px;
+    }
+    .page-body ul { padding-right: 22px; margin-bottom: 8px; }
+    .page-body ol { padding-right: 22px; margin-bottom: 8px; }
+
+    /* ────────────────────────────────────────────
+       MODAL
+    ──────────────────────────────────────────── */
+    #modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,14,23,.88);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      display: none;
+      align-items: center; justify-content: center;
+    }
+    #modal-overlay.open { display: flex; }
+
+    #modal-box {
+      background: var(--bg3);
+      border: 1px solid rgba(15,187,255,.3);
+      border-radius: 16px;
+      padding: 28px;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.65), 0 0 40px var(--glow);
+    }
+    .m-title { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
+    .m-sub   { font-size: 12px; color: var(--txm); margin-bottom: 20px; }
+    .m-input {
+      width: 100%;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 14px;
+      color: var(--tx); font-family: 'Cairo', sans-serif; font-size: 13.5px;
+      outline: none; direction: rtl; margin-bottom: 16px;
+      transition: border-color .2s;
+    }
+    .m-input:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--glow); }
+    .m-actions { display: flex; gap: 10px; }
+    .m-ok {
+      flex: 1; padding: 11px;
+      background: linear-gradient(135deg, var(--acc), var(--acc2));
+      border: none; border-radius: 10px;
+      color: #fff; font-family: 'Cairo', sans-serif; font-size: 13px; font-weight: 700;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .m-ok:hover { opacity: .88; }
+    .m-cancel {
+      padding: 11px 18px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 10px; color: var(--txm);
+      font-family: 'Cairo', sans-serif; font-size: 13px; cursor: pointer;
+      transition: all .2s;
+    }
+    .m-cancel:hover { border-color: var(--txm); color: var(--tx); }
+
+    /* ── toast ── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: var(--bg3); border: 1px solid var(--acc);
+      border-radius: 12px; padding: 11px 20px;
+      color: var(--acc); font-size: 13px; font-weight: 600;
+      z-index: 300; transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+      white-space: nowrap; box-shadow: 0 4px 20px var(--glow);
+      display: flex; align-items: center; gap: 8px;
+      pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── loading ── */
+    #loading {
+      position: fixed; inset: 0;
+      background: rgba(5,14,23,.93);
+      z-index: 400; display: none;
+      flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    }
+    #loading.on { display: flex; }
+    .spin {
+      width: 46px; height: 46px;
+      border: 3px solid rgba(15,187,255,.15);
+      border-top-color: var(--acc);
+      border-radius: 50%;
+      animation: rotate .75s linear infinite;
+    }
+    @keyframes rotate { to { transform: rotate(360deg); } }
+    .load-txt { color: var(--acc); font-size: 14px; font-weight: 600; }
+
+    /* ────────────────────────────────────────────
+       PRINT
+    ──────────────────────────────────────────── */
+    @media print {
+      @page { size: A4; margin: 0; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+      body { background: #fff !important; }
+
+      #sidebar, #topbar, #toolbar, #modal-overlay,
+      #toast, #loading, .page-gutter, .page-rule,
+      #welcome { display: none !important; }
+
+      #app   { display: block !important; }
+      #main  { display: block !important; height: auto !important; overflow: visible !important; }
+      #canvas {
+        display: block !important;
+        padding: 0 !important;
+        background: #fff !important;
+        overflow: visible !important;
+      }
+
+      .a4-cover, .a4-page {
+        width: 210mm !important;
+        height: 297mm !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        overflow: hidden !important;
+      }
+      .a4-cover:last-child, .a4-page:last-child {
+        page-break-after: avoid !important; break-after: avoid !important;
+      }
+      .page-num { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spin"></div>
+  <div class="load-txt">جارٍ إنشاء ملف PDF…</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div class="m-title" id="m-title">إضافة كتاب جديد</div>
+    <div class="m-sub"   id="m-sub">أدخل عنوان الكتاب</div>
+    <input class="m-input" id="m-inp" type="text" placeholder="العنوان…" />
+    <div class="m-actions">
+      <button class="m-ok"     id="m-ok">إضافة</button>
+      <button class="m-cancel" id="m-cancel">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <span id="t-icon">✓</span>
+  <span id="t-msg">تم</span>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- ══════════ MAIN (order:1 = left) ══════════ -->
+  <div id="main">
+
+    <!-- topbar -->
+    <div id="topbar">
+      <div id="tb-title">محرر النشر الرقمي</div>
+      <div id="tb-chapter"></div>
+      <div class="tb-stat" id="stat-words"><span>📝</span><span>0 كلمة</span></div>
+      <div class="tb-stat"><span>📄</span><span id="stat-pages">0 صفحة</span></div>
+    </div>
+
+    <!-- toolbar -->
+    <div id="toolbar">
+
+      <span class="t-lbl">تنسيق</span>
+
+      <!-- Bold -->
+      <button class="t-btn" id="tb-b" data-tip="غامق (Ctrl+B)" onclick="C('bold')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h8a4 4 0 010 8H6V4zm0 8h9a4 4 0 010 8H6v-8z"/></svg>
+      </button>
+      <!-- Italic -->
+      <button class="t-btn" id="tb-i" data-tip="مائل (Ctrl+I)" onclick="C('italic')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 4h6v2h-2.7l-3.6 12H13v2H7v-2h2.7l3.6-12H11V4z"/></svg>
+      </button>
+      <!-- Underline -->
+      <button class="t-btn" id="tb-u" data-tip="تحته خط (Ctrl+U)" onclick="C('underline')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 21h14v-2H5v2zm7-4a6 6 0 006-6V3h-2.5v8a3.5 3.5 0 01-7 0V3H6v8a6 6 0 006 6z"/></svg>
+      </button>
+      <!-- Strikethrough -->
+      <button class="t-btn" data-tip="يتوسطه خط" onclick="C('strikeThrough')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.154 14c.23.516.346 1.09.346 1.72 0 1.342-.524 2.392-1.571 3.147C14.88 19.622 13.433 20 11.586 20c-1.64 0-3.263-.381-4.87-1.144V16.6c1.52.877 3.075 1.316 4.666 1.316 2.551 0 3.83-.732 3.839-2.195a2.25 2.25 0 00-.648-1.7zM13.952 10H7.357L6.5 8h14l-.857 2h-5.69zM7.333 6c.173-.36.595-.782 1.265-1.267C9.868 3.755 11.112 3.5 12.5 3.5c.74 0 1.48.11 2.22.33V6H7.333z"/></svg>
+      </button>
+
+      <div class="t-sep"></div>
+      <span class="t-lbl">عنوان</span>
+
+      <button class="t-btn" data-tip="عنوان رئيسي H1" onclick="insertH(1)" style="font-size:11px;font-weight:900;letter-spacing:-.5px">H1</button>
+      <button class="t-btn" data-tip="عنوان فرعي H2"  onclick="insertH(2)" style="font-size:11px;font-weight:900;letter-spacing:-.5px">H2</button>
+
+      <div class="t-sep"></div>
+      <span class="t-lbl">محاذاة</span>
+
+      <!-- Right -->
+      <button class="t-btn" data-tip="يمين" onclick="C('justifyRight')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm4 4h14v2H7v-2zm-4 4h18v2H3v-2zm4 4h14v2H7v-2z"/></svg>
+      </button>
+      <!-- Center -->
+      <button class="t-btn" data-tip="وسط" onclick="C('justifyCenter')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm3 4h12v2H6v-2zm-3 4h18v2H3v-2zm3 4h12v2H6v-2z"/></svg>
+      </button>
+      <!-- Left -->
+      <button class="t-btn" data-tip="يسار" onclick="C('justifyLeft')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 4h12v2H3v-2zm0 4h18v2H3v-2zm0 4h12v2H3v-2z"/></svg>
+      </button>
+      <!-- Justify -->
+      <button class="t-btn" data-tip="ضبط الأسطر" onclick="C('justifyFull')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 6h18v2H3V6zm0 4h18v2H3v-2zm0 4h18v2H3v-2zm0 4h18v2H3v-2z"/></svg>
+      </button>
+
+      <div class="t-sep"></div>
+      <span class="t-lbl">قوائم</span>
+
+      <button class="t-btn" data-tip="قائمة نقطية" onclick="C('insertUnorderedList')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h2v2H4V6zm0 5h2v2H4v-2zm0 5h2v2H4v-2zm4-10h12v2H8V6zm0 5h12v2H8v-2zm0 5h12v2H8v-2z"/></svg>
+      </button>
+      <button class="t-btn" data-tip="قائمة مرقمة" onclick="C('insertOrderedList')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.01 7.25h1V5.5H4.5l-1.25.5v.74l.76-.24v.75zM3.5 13h2V12h-1.5v-.5H5V11H3.5v-.5H5V9.5H3.5V13zm.5 4.5h1.5v.5H4v1h2v-3H4V17zm4-11.5h12v2H8V6zm0 5h12v2H8v-2zm0 5h12v2H8v-2z"/></svg>
+      </button>
+
+      <div class="t-sep"></div>
+      <span class="t-lbl">حجم</span>
+
+      <select class="t-sel" onchange="C('fontSize',this.value)" style="width:68px">
+        <option value="1">8pt</option>
+        <option value="2">10pt</option>
+        <option value="3" selected>12pt</option>
+        <option value="4">14pt</option>
+        <option value="5">18pt</option>
+        <option value="6">24pt</option>
+        <option value="7">32pt</option>
+      </select>
+
+      <div class="t-sep"></div>
+      <span class="t-lbl">لون</span>
+
+      <div class="cpick-wrap" title="لون النص">
+        <div class="cpick-ico">🎨</div>
+        <input type="color" id="txtcolor" value="#1a1a1a" onchange="C('foreColor',this.value)" />
+      </div>
+
+      <div class="t-sep"></div>
+      <span class="t-lbl">صورة</span>
+
+      <button class="t-btn" data-tip="إدراج صورة" onclick="document.getElementById('img-inp').click()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+        </svg>
+      </button>
+      <input type="file" id="img-inp" accept="image/*" style="display:none" onchange="insertImg(event)" />
+
+      <div class="t-sep"></div>
+
+      <button class="t-btn" data-tip="مسح التنسيق" onclick="C('removeFormat')" style="color:var(--txm)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 20H7L3 16l10-10 7 7-3 3"/><line x1="6" y1="6" x2="20" y2="20"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- editor canvas -->
+    <div id="canvas">
+      <div id="welcome">
+        <div class="w-icon">📖</div>
+        <div class="w-title">ابدأ رحلة النشر الرقمي</div>
+        <div class="w-sub">أضف كتاباً جديداً من الشريط الجانبي ثم اختر فصلاً للبدء بالكتابة</div>
+      </div>
+    </div>
+
+  </div><!-- /#main -->
+
+  <!-- ══════════ SIDEBAR (order:2 = right) ══════════ -->
+  <div id="sidebar">
+
+    <!-- brand -->
+    <div class="sb-brand">
+      <div class="sb-brand-row">
+        <div class="sb-icon">📚</div>
+        <div>
+          <div class="sb-brand-name">منصة النشر الرقمي</div>
+          <div class="sb-brand-sub">A.Y TECHNOLOGY</div>
+        </div>
+      </div>
+      <button id="btn-add-book">
+        <span style="font-size:16px;line-height:1">＋</span>
+        إضافة كتاب جديد
+      </button>
+    </div>
+
+    <!-- books list -->
+    <div id="sb-books">
+      <div class="sb-empty">لا توجد كتب بعد<br/>ابدأ بإضافة كتابك الأول ✨</div>
+    </div>
+
+    <!-- footer -->
+    <div class="sb-footer">
+      <div class="pm-label">وضع الورق</div>
+      <div class="pm-row">
+        <button class="pm-btn on" data-pm="white">أبيض</button>
+        <button class="pm-btn"    data-pm="cream">كريمي</button>
+        <button class="pm-btn"    data-pm="night">ليلي</button>
+      </div>
+      <button id="btn-pdf">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="15" height="15">
+          <path d="M12 2v13M7 11l5 5 5-5"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+        </svg>
+        تحميل كـ PDF
+      </button>
+    </div>
+
+  </div><!-- /#sidebar -->
+
+</div><!-- /#app -->
+
+<script>
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+const S = {
+  books: [],
+  bk: null,   // active book index
+  ch: null,   // active chapter index
+  mMode: null,
+  mBk: null
+};
+
+const MM_TO_PX = 96 / 25.4;  // 96dpi
+// A4 content height ≈ 297mm – 22mm top – 18mm bottom = 257mm
+const MAX_CONTENT_PX = Math.floor(257 * MM_TO_PX); // ≈ 971px
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+let toastTimer;
+function toast(msg, icon = '✓') {
+  clearTimeout(toastTimer);
+  document.getElementById('t-msg').textContent  = msg;
+  document.getElementById('t-icon').textContent = icon;
+  const el = document.getElementById('toast');
+  el.classList.add('show');
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ═══════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════ */
+function openModal(mode, bkIdx = null) {
+  S.mMode = mode; S.mBk = bkIdx;
+  const inp = document.getElementById('m-inp');
+  if (mode === 'book') {
+    document.getElementById('m-title').textContent = 'إضافة كتاب جديد';
+    document.getElementById('m-sub').textContent   = 'أدخل عنوان الكتاب الجديد';
+    inp.placeholder = 'عنوان الكتاب…';
+    document.getElementById('m-ok').textContent = 'إضافة الكتاب';
+  } else {
+    document.getElementById('m-title').textContent = 'إضافة فصل جديد';
+    document.getElementById('m-sub').textContent   = 'أدخل عنوان الفصل';
+    inp.placeholder = 'عنوان الفصل…';
+    document.getElementById('m-ok').textContent = 'إضافة الفصل';
+  }
+  inp.value = '';
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(() => inp.focus(), 80);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  S.mMode = null;
+}
+
+document.getElementById('m-cancel').onclick = closeModal;
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id === 'modal-overlay') closeModal(); });
+document.getElementById('m-inp').addEventListener('keydown', e => {
+  if (e.key === 'Enter')  document.getElementById('m-ok').click();
+  if (e.key === 'Escape') closeModal();
+});
+
+document.getElementById('m-ok').onclick = () => {
+  const val = document.getElementById('m-inp').value.trim();
+  if (!val) {
+    const inp = document.getElementById('m-inp');
+    inp.style.borderColor = '#f55'; setTimeout(() => inp.style.borderColor = '', 900);
+    return;
+  }
+  if (S.mMode === 'book')    addBook(val);
+  else                       addChapter(S.mBk, val);
+  closeModal();
+};
+
+/* ═══════════════════════════════════════════
+   ADD BOOK / CHAPTER
+═══════════════════════════════════════════ */
+document.getElementById('btn-add-book').onclick = () => openModal('book');
+
+function addBook(title) {
+  S.books.push({ id: uid(), title, chapters: [] });
+  const bIdx = S.books.length - 1;
+  renderSidebar();
+  // auto-add intro chapter
+  addChapter(bIdx, 'مقدمة الكتاب');
+  toast(`تمت إضافة "${title}"`, '📚');
+}
+
+function addChapter(bIdx, title) {
+  S.books[bIdx].chapters.push({ id: uid(), title, pages: [mkPage()] });
+  renderSidebar();
+  openChapter(bIdx, S.books[bIdx].chapters.length - 1);
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function mkPage() { return { id: uid(), html: '' }; }
+
+/* ═══════════════════════════════════════════
+   OPEN CHAPTER
+═══════════════════════════════════════════ */
+function openChapter(bIdx, cIdx) {
+  S.bk = bIdx; S.ch = cIdx;
+  const book = S.books[bIdx];
+  const ch   = book.chapters[cIdx];
+
+  document.getElementById('tb-title').textContent   = book.title;
+  document.getElementById('tb-chapter').textContent = ch.title;
+
+  renderCanvas(bIdx, cIdx);
+  renderSidebar();
+}
+
+/* ═══════════════════════════════════════════
+   RENDER SIDEBAR
+═══════════════════════════════════════════ */
+function renderSidebar() {
+  const wrap = document.getElementById('sb-books');
+  if (!S.books.length) {
+    wrap.innerHTML = '<div class="sb-empty">لا توجد كتب بعد<br/>ابدأ بإضافة كتابك الأول ✨</div>';
+    return;
+  }
+  wrap.innerHTML = '';
+  S.books.forEach((bk, bi) => {
+    const isAB = bi === S.bk;
+    const div = document.createElement('div');
+    div.className = 'book-wrap' + (isAB ? ' active open' : '');
+
+    const chs = bk.chapters.map((ch, ci) => {
+      const isAC = isAB && ci === S.ch;
+      return `<div class="ch-item${isAC ? ' active' : ''}" onclick="openChapter(${bi},${ci})">
+        <span class="ch-dot"></span>
+        <span style="flex:1">${esc(ch.title)}</span>
+      </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="book-hdr" onclick="toggleBook(this,${bi})">
+        <span class="book-ico">📖</span>
+        <span class="book-lbl">${esc(bk.title)}</span>
+        <span class="book-arr">›</span>
+      </div>
+      <div class="book-chs">
+        ${chs}
+        <button class="btn-add-ch" onclick="openModal('chapter',${bi})">＋ إضافة فصل</button>
+      </div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function toggleBook(hdr, bi) {
+  const wrap = hdr.parentElement;
+  const wasOpen = wrap.classList.contains('open');
+  document.querySelectorAll('.book-wrap').forEach(w => w.classList.remove('open'));
+  if (!wasOpen) wrap.classList.add('open');
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ═══════════════════════════════════════════
+   RENDER CANVAS  (Cover + pages)
+═══════════════════════════════════════════ */
+function renderCanvas(bIdx, cIdx) {
+  const canvas  = document.getElementById('canvas');
+  const book    = S.books[bIdx];
+  const chapter = book.chapters[cIdx];
+
+  // hide welcome
+  const wl = document.getElementById('welcome');
+  if (wl) wl.style.display = 'none';
+
+  canvas.innerHTML = '';
+
+  /* 1. Cover page */
+  canvas.appendChild(buildCover(book, chapter));
+
+  /* 2. Writing pages */
+  chapter.pages.forEach((pg, pi) => {
+    canvas.appendChild(buildPage(pg, pi, bIdx, cIdx));
+  });
+
+  updateStats();
+
+  // focus first writing page
+  setTimeout(() => {
+    const first = canvas.querySelector('.page-body');
+    if (first) { first.focus(); placeCaretAtEnd(first); }
+  }, 60);
+}
+
+/* ── Cover page ── */
+function buildCover(book, chapter) {
+  const d = document.createElement('div');
+  d.className = 'a4-cover';
+  d.innerHTML = `
+    <div class="cover-gradient"></div>
+    <div class="cover-top-bar"></div>
+    <div class="cover-body">
+      <div class="cover-publisher">A.Y TECHNOLOGY · منصة النشر الرقمي</div>
+      <div class="cover-book-title">${esc(book.title)}</div>
+      <div class="cover-divider"></div>
+      <div class="cover-chapter-label">الفصل</div>
+      <div class="cover-chapter-title">${esc(chapter.title)}</div>
+    </div>
+    <div class="cover-footer">
+      © ${new Date().getFullYear()} · جميع الحقوق محفوظة · A.Y Technology
+    </div>
+    <div class="cover-bottom-bar"></div>
+  `;
+  return d;
+}
+
+/* ── Writing page ── */
+function buildPage(pgData, pgIdx, bIdx, cIdx) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'a4-page';
+  wrapper.dataset.pi = pgIdx;
+
+  const body = document.createElement('div');
+  body.className     = 'page-body';
+  body.contentEditable = 'true';
+  body.dataset.ph    = 'ابدأ الكتابة هنا…';
+  body.dataset.bi    = bIdx;
+  body.dataset.ci    = cIdx;
+  body.dataset.pi    = pgIdx;
+  if (pgData.html) body.innerHTML = pgData.html;
+
+  body.addEventListener('input',  () => onInput(body, bIdx, cIdx, pgIdx));
+  body.addEventListener('keydown', e => onKeyDown(e, body));
+  body.addEventListener('mouseup', syncToolbar);
+  body.addEventListener('keyup',   syncToolbar);
+
+  wrapper.innerHTML = `
+    <div class="page-gutter"></div>
+    <div class="page-rule"></div>
+    <div class="page-num">${pgIdx + 1}</div>
+  `;
+  wrapper.appendChild(body);
+  return wrapper;
+}
+
+/* ═══════════════════════════════════════════
+   INPUT + OVERFLOW
+═══════════════════════════════════════════ */
+function onInput(body, bIdx, cIdx, pgIdx) {
+  // save
+  S.books[bIdx].chapters[cIdx].pages[pgIdx].html = body.innerHTML;
+  checkOverflow(body, bIdx, cIdx, pgIdx);
+  updateStats();
+}
+
+function checkOverflow(body, bIdx, cIdx, pgIdx) {
+  if (body.scrollHeight <= MAX_CONTENT_PX + 30) return;
+
+  const chapter = S.books[bIdx].chapters[cIdx];
+  if (pgIdx < chapter.pages.length - 1) return; // not last page
+
+  // add new page
+  chapter.pages.push(mkPage());
+  const newPg   = chapter.pages[chapter.pages.length - 1];
+  const newPgEl = buildPage(newPg, chapter.pages.length - 1, bIdx, cIdx);
+  document.getElementById('canvas').appendChild(newPgEl);
+  renumberPages();
+  updateStats();
+
+  setTimeout(() => {
+    const nb = newPgEl.querySelector('.page-body');
+    if (nb) { nb.focus(); placeCaretAtEnd(nb); }
+    toast('تمت إضافة صفحة جديدة', '📄');
+  }, 60);
+}
+
+function onKeyDown(e, body) {
+  if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertHTML', false, '\u00A0\u00A0\u00A0\u00A0'); }
+}
+
+function renumberPages() {
+  document.querySelectorAll('.a4-page').forEach((p, i) => {
+    const n = p.querySelector('.page-num');
+    if (n) n.textContent = i + 1;
+  });
+}
+
+/* ═══════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════ */
+function updateStats() {
+  const bodies = document.querySelectorAll('.page-body');
+  let txt = '';
+  bodies.forEach(b => txt += b.innerText + ' ');
+  const words = txt.trim() ? txt.trim().split(/\s+/).filter(w => w).length : 0;
+  document.getElementById('stat-words').innerHTML = `<span>📝</span><span>${words} كلمة</span>`;
+  document.getElementById('stat-pages').textContent = `${bodies.length} صفحة`;
+}
+
+/* ═══════════════════════════════════════════
+   FORMATTING
+═══════════════════════════════════════════ */
+function C(cmd, val = null) {
+  document.execCommand(cmd, false, val);
+  syncToolbar();
+}
+
+function insertH(level) {
+  const sel = window.getSelection();
+  if (!sel.rangeCount) return;
+  const r = sel.getRangeAt(0);
+  const h = document.createElement('h' + level);
+  h.innerHTML = sel.toString() || (level === 1 ? 'عنوان رئيسي' : 'عنوان فرعي');
+  r.deleteContents();
+  r.insertNode(h);
+  r.setStartAfter(h); r.collapse(true);
+  sel.removeAllRanges(); sel.addRange(r);
+  saveActive();
+}
+
+function insertImg(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.execCommand('insertHTML', false,
+      `<img src="${ev.target.result}" style="max-width:100%;height:auto;display:block;margin:10px auto;border-radius:4px" />`);
+    saveActive();
+  };
+  reader.readAsDataURL(f);
+  e.target.value = '';
+}
+
+function saveActive() {
+  const body = document.querySelector('.page-body:focus');
+  if (!body) return;
+  const bi = +body.dataset.bi, ci = +body.dataset.ci, pi = +body.dataset.pi;
+  S.books[bi].chapters[ci].pages[pi].html = body.innerHTML;
+}
+
+function syncToolbar() {
+  [['bold','tb-b'],['italic','tb-i'],['underline','tb-u']].forEach(([cmd,id]) => {
+    document.getElementById(id).classList.toggle('on', document.queryCommandState(cmd));
+  });
+}
+
+/* ═══════════════════════════════════════════
+   PAPER MODES
+═══════════════════════════════════════════ */
+const MODES = {
+  white: { bg: '#ffffff', tx: '#1a1a1a', bd: '#d1d5db' },
+  cream: { bg: '#f5f0e8', tx: '#2c2416', bd: '#c8b89a' },
+  night: { bg: '#1f2535', tx: '#ccd9e8', bd: '#2e4260' }
+};
+const modeNames = { white: 'أبيض', cream: 'كريمي', night: 'ليلي' };
+
+document.querySelectorAll('.pm-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('on'));
+    this.classList.add('on');
+    const m = MODES[this.dataset.pm];
+    const r = document.documentElement.style;
+    r.setProperty('--paper-bg', m.bg);
+    r.setProperty('--paper-tx', m.tx);
+    r.setProperty('--paper-bd', m.bd);
+    toast('وضع ' + modeNames[this.dataset.pm], '🎨');
+  });
+});
+
+/* ═══════════════════════════════════════════
+   PDF EXPORT
+═══════════════════════════════════════════ */
+document.getElementById('btn-pdf').onclick = exportPDF;
+
+function exportPDF() {
+  if (S.bk === null) { toast('افتح كتاباً أولاً', '⚠️'); return; }
+
+  const book = S.books[S.bk];
+  const ch   = book.chapters[S.ch];
+
+  const pBg = getComputedStyle(document.documentElement).getPropertyValue('--paper-bg').trim() || '#fff';
+  const pTx = getComputedStyle(document.documentElement).getPropertyValue('--paper-tx').trim() || '#1a1a1a';
+
+  document.getElementById('loading').classList.add('on');
+
+  // Build printable HTML
+  const canvas = document.getElementById('canvas');
+  const allPages = canvas.querySelectorAll('.a4-cover, .a4-page');
+
+  let pagesHTML = '';
+
+  allPages.forEach((pg, i) => {
+    const isCover = pg.classList.contains('a4-cover');
+    if (isCover) {
+      // clone cover inner HTML
+      pagesHTML += `
+        <div style="width:210mm;height:297mm;position:relative;overflow:hidden;page-break-after:always;break-after:page;background:${pBg};color:${pTx};font-family:'Cairo',sans-serif;direction:rtl;">
+          <div style="position:absolute;inset:0;background:linear-gradient(160deg,rgba(15,187,255,.08) 0%,transparent 60%);pointer-events:none"></div>
+          <div style="position:absolute;top:0;left:0;right:0;height:8px;background:linear-gradient(90deg,#0fbbff,#0891c8)"></div>
+          ${pg.querySelector('.cover-body') ? pg.querySelector('.cover-body').outerHTML : ''}
+          ${pg.querySelector('.cover-footer') ? pg.querySelector('.cover-footer').outerHTML : ''}
+          <div style="position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#0891c8,#0fbbff)"></div>
+        </div>`;
+    } else {
+      const body = pg.querySelector('.page-body');
+      const num  = i; // page number relative to all pages
+      pagesHTML += `
+        <div style="width:210mm;height:297mm;position:relative;overflow:hidden;page-break-after:always;break-after:page;background:${pBg};color:${pTx};font-family:'Cairo',sans-serif;direction:rtl;">
+          <div style="padding-top:22mm;padding-bottom:18mm;padding-right:3cm;padding-left:2cm;font-family:'Cairo',sans-serif;font-size:14pt;line-height:2.1;color:${pTx};direction:rtl;text-align:right;word-break:break-word;">
+            ${body ? body.innerHTML : ''}
+          </div>
+          <div style="position:absolute;bottom:9mm;left:0;right:0;text-align:center;font-family:'Cairo',sans-serif;font-size:9.5pt;color:#aaa">${num}</div>
+        </div>`;
+    }
+  });
+
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:-9999px;';
+  container.innerHTML = pagesHTML;
+  document.body.appendChild(container);
+
+  html2pdf().set({
+    margin: 0,
+    filename: `${book.title} - ${ch.title}.pdf`,
+    image: { type: 'jpeg', quality: 0.97 },
+    html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  }).from(container).save().then(() => {
+    document.body.removeChild(container);
+    document.getElementById('loading').classList.remove('on');
+    toast(`تم تحميل "${book.title}" بنجاح`, '✅');
+  }).catch(err => {
+    document.body.removeChild(container);
+    document.getElementById('loading').classList.remove('on');
+    console.error(err);
+    toast('حدث خطأ — جرّب Ctrl+P للطباعة', '⚠️');
+  });
+}
+
+/* ═══════════════════════════════════════════
+   KEYBOARD SHORTCUTS
+═══════════════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (!(e.ctrlKey || e.metaKey)) return;
+  const focused = document.querySelector('.page-body:focus');
+  switch(e.key.toLowerCase()) {
+    case 'b': if (focused) { e.preventDefault(); C('bold'); }        break;
+    case 'i': if (focused) { e.preventDefault(); C('italic'); }      break;
+    case 'u': if (focused) { e.preventDefault(); C('underline'); }   break;
+    case 'p': e.preventDefault(); exportPDF();                        break;
+  }
+});
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+function placeCaretAtEnd(el) {
+  const r = document.createRange(), s = window.getSelection();
+  r.selectNodeContents(el); r.collapse(false);
+  s.removeAllRanges(); s.addRange(r);
+}
+
+/* ═══════════════════════════════════════════
+   INIT  — sample book
+═══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  const intro = `<h1>مرحباً بك في منصة النشر الرقمي</h1>
+<p>هذه منصة متطورة لتأليف ونشر الكتب الرقمية، مطوّرة بواسطة <strong>A.Y Technology</strong>.</p>
+<p>يمكنك البدء بالكتابة مباشرةً في هذا المحرر، وتنسيق النص باستخدام شريط الأدوات أعلاه.</p>
+<h2>المميزات الرئيسية</h2>
+<p>✅ محاكاة صفحات A4 حقيقية مع هامش التجليد.</p>
+<p>✅ إنشاء صفحات جديدة تلقائياً عند امتلاء الصفحة.</p>
+<p>✅ تصدير PDF احترافي جاهز للطباعة.</p>
+<p>✅ أوضاع ورق متعددة: أبيض، كريمي، ليلي.</p>
+<p>✅ صفحة غلاف فنية تُنشأ تلقائياً لكل فصل.</p>`;
+
+  const ch2 = `<h1>الفصل الأول: البداية</h1>
+<p>في هذا الفصل نتعرف على أساسيات استخدام المنصة وكيفية تنظيم الكتاب وفصوله.</p>
+<p>يمكنك إضافة فصول جديدة بالضغط على "إضافة فصل" في القائمة الجانبية.</p>`;
+
+  S.books.push({
+    id: uid(),
+    title: 'كتابي الأول',
+    chapters: [
+      { id: uid(), title: 'مقدمة الكتاب', pages: [{ id: uid(), html: intro }] },
+      { id: uid(), title: 'الفصل الأول: البداية', pages: [{ id: uid(), html: ch2 }] }
+    ]
+  });
+
+  renderSidebar();
+  openChapter(0, 0);
+});
+</script>
+</body>
+</html>
